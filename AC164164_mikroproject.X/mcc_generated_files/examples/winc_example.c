@@ -35,6 +35,7 @@
  * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
+#include <stdio.h>
 #include "../mcc.h"
 #include "../winc/include/winc.h"
 #include "../winc/include/winc_legacy.h"

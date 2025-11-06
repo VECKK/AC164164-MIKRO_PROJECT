@@ -70,7 +70,7 @@
 // <s> SSID
 // <i> Target WLAN SSID
 // <id> main_wlan_ssid
-#define CFG_MAIN_WLAN_SSID "uWifi"
+#define CFG_MAIN_WLAN_SSID "UPC50B110"
 
 // <y> Authentication
 // <i> Target WLAN Authentication
@@ -85,7 +85,7 @@
 // <s> Password
 // <i> Target WLAN password
 // <id> main_wlan_psk
-#define CFG_MAIN_WLAN_PSK "wiktoria"
+#define CFG_MAIN_WLAN_PSK "yws6npVtqeub"
 
 // </h>
 

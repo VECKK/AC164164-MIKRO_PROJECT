@@ -117,9 +117,9 @@ int_fast8_t winc_adapter_spi_open(void)
 int_fast8_t winc_adapter_spi_write(const uint8_t *puBuf, size_t size)
 {
     spiMaster[WINC].spiOpen();
-    // Select SPI chip select pin.
+    nCS_SetLow();
     spiMaster[WINC].writeBlock((uint8_t*)puBuf, size);
-    // Select SPI chip select pin.
+    nCS_SetHigh();
     spiMaster[WINC].spiClose();
 
     return 1;
@@ -128,9 +128,9 @@ int_fast8_t winc_adapter_spi_write(const uint8_t *puBuf, size_t size)
 int_fast8_t winc_adapter_spi_read(uint8_t *puBuf, size_t size)
 {
     spiMaster[WINC].spiOpen();
-    // Select SPI chip select pin.
+    nCS_SetLow();
     spiMaster[WINC].readBlock(puBuf, size);
-    // Select SPI chip select pin.
+    nCS_SetHigh();
     spiMaster[WINC].spiClose();
 
     return 1;

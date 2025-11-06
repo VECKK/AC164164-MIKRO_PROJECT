@@ -932,6 +932,152 @@
 #define SDO1_SetDigitalOutput() (_TRISC0 = 0)
 /**
   @Summary
+    Sets the GPIO pin, RC1, high using LATC1.
+
+  @Description
+    Sets the GPIO pin, RC1, high using LATC1.
+
+  @Preconditions
+    The RC1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC1 high (1)
+    nCS_SetHigh();
+    </code>
+
+*/
+#define nCS_SetHigh()          (_LATC1 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RC1, low using LATC1.
+
+  @Description
+    Sets the GPIO pin, RC1, low using LATC1.
+
+  @Preconditions
+    The RC1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC1 low (0)
+    nCS_SetLow();
+    </code>
+
+*/
+#define nCS_SetLow()           (_LATC1 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RC1, using LATC1.
+
+  @Description
+    Toggles the GPIO pin, RC1, using LATC1.
+
+  @Preconditions
+    The RC1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RC1
+    nCS_Toggle();
+    </code>
+
+*/
+#define nCS_Toggle()           (_LATC1 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RC1.
+
+  @Description
+    Reads the value of the GPIO pin, RC1.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RC1
+    postValue = nCS_GetValue();
+    </code>
+
+*/
+#define nCS_GetValue()         _RC1
+/**
+  @Summary
+    Configures the GPIO pin, RC1, as an input.
+
+  @Description
+    Configures the GPIO pin, RC1, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC1 as an input
+    nCS_SetDigitalInput();
+    </code>
+
+*/
+#define nCS_SetDigitalInput()  (_TRISC1 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RC1, as an output.
+
+  @Description
+    Configures the GPIO pin, RC1, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC1 as an output
+    nCS_SetDigitalOutput();
+    </code>
+
+*/
+#define nCS_SetDigitalOutput() (_TRISC1 = 0)
+/**
+  @Summary
     Sets the GPIO pin, RC2, high using LATC2.
 
   @Description

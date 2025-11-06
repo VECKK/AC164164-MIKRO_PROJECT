@@ -45,7 +45,10 @@
 /**
   Section: Included Files
 */
-#include "mcc_generated_files/system.h"
+#include    <stdio.h>
+#include    "../system.h"
+#include    "mcc_generated_files/examples/winc_example.h"
+
 
 /*
                          Main application
@@ -57,7 +60,7 @@ int main(void)
 
     while (1)
     {
-        // Add your application code
+        winc_example();
     }
 
     return 1;
