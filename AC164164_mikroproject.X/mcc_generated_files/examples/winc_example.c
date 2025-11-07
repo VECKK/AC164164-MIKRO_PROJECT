@@ -36,11 +36,70 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "../mcc.h"
 #include "../winc/include/winc.h"
 #include "../winc/include/winc_legacy.h"
 
+/* ===================== KONFIGURACJA SIECI ===================== */
+#define WLAN_SSID   "PROJEKT"       // Wi-Fi network name
+#define WLAN_PSK    "12345678"      // password
+#define WLAN_AUTH   M2M_WIFI_SEC_WPA_PSK
+
+/* ===================== PROTOTYPY ===================== */
 void winc_register_init(void);
+static void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg);
+
+/* ===================== ZMIENNE GLOBALNE ===================== */
+static bool wifi_connected = false;
+
+/* ===================== FUNKCJE ===================== */
+
+/**
+ * Initialization function and Wi-Fi connection
+ */
+
+void winc_example(void)
+{
+    printf("\r\nModule initialization...\r\n");
+
+    winc_register_init();
+    winc_adapter_init();
+
+    tstrWifiInitParam param;
+    memset(&param, 0, sizeof(param));
+    param.pfAppWifiCb = wifi_event_cb;
+
+    /* Wi-Fi initialization */
+    int8_t ret = m2m_wifi_init(&param);
+    if (ret != M2M_SUCCESS)
+    {
+        printf("Wi-Fi initialization error! Code: %d\r\n", ret);
+        while(1);
+    }
+
+    /* Wi-Fi connection */
+    printf("Connecting to a Wi-Fi network: %s\r\n", WLAN_SSID);
+    ret = m2m_wifi_connect((char *)WLAN_SSID,
+                           strlen(WLAN_SSID),
+                           WLAN_AUTH,
+                           (void *)WLAN_PSK,
+                           M2M_WIFI_CH_ALL);
+    if (ret != M2M_SUCCESS)
+    {
+        printf("Connection error! Code: %d\r\n", ret);
+        while(1);
+    }
+
+    while(1)
+    {
+        m2m_wifi_handle_events(NULL);
+    }
+}
+
+/**
+ *  Callback Wi-Fi
+ */
 
 void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
 {
@@ -48,34 +107,32 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
     {
     case M2M_WIFI_RESP_CON_STATE_CHANGED:
         {
-            // add custom code here
+            tstrM2mWifiStateChanged *pState = (tstrM2mWifiStateChanged *)pvMsg;
+            if (pState->u8CurrState == M2M_WIFI_CONNECTED)
+            {
+                printf("Connected to the network! Waiting for DHCP address...\r\n");
+            }
+            else if (pState->u8CurrState == M2M_WIFI_DISCONNECTED)
+            {
+                printf("Disconnected. Attempting to reconnect...\r\n");
+                wifi_connected = false;
+                m2m_wifi_connect((char *)WLAN_SSID, strlen(WLAN_SSID),
+                                 WLAN_AUTH, (void *)WLAN_PSK, M2M_WIFI_CH_ALL);
+            }
+            break;
         }
-        break;
+        
+        case M2M_WIFI_REQ_DHCP_CONF:
+        {
+            uint8_t *ipAddr = (uint8_t *)pvMsg;
+            wifi_connected = true;
+            printf("IP address received: %u.%u.%u.%u\r\n",
+                   ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+            break;
+        }
 
     default:
         break;
-    }
-}
-
-void winc_example(void)
-{
-    winc_register_init();
-    winc_adapter_init();
-    tstrWifiInitParam   param;
-    
-    m2m_memset((uint8_t *)&param, 0, sizeof(param));
-    param.pfAppWifiCb   = wifi_event_cb;
-
-    int8_t ret = m2m_wifi_init(&param);
-    if (M2M_SUCCESS != ret){
-        while(1);
-    }
-    
-    ret = m2m_wifi_connect((char *)CFG_MAIN_WLAN_SSID, sizeof(CFG_MAIN_WLAN_SSID), CFG_MAIN_WLAN_AUTH, (void *)CFG_MAIN_WLAN_PSK, M2M_WIFI_CH_ALL);
-    
-    while(1)
-    {
-        m2m_wifi_handle_events(NULL);
     }
 }
 

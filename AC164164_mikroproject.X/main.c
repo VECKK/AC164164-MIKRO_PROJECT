@@ -57,10 +57,13 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
+    
+    printf("\r\nStart test Wi-Fi\r\n");
+    winc_example();
 
     while (1)
     {
-        winc_example();
+
     }
 
     return 1;
