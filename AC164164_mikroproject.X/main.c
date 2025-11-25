@@ -47,8 +47,8 @@
 */
 #include    <stdio.h>
 #include    "../system.h"
-#include    "mcc_generated_files/examples/winc_example.h"
-
+#include    "mcc_generated_files/examples/wifi_connection.h"
+#include    "mcc_generated_files/examples/weather_client.h"
 
 /*
                          Main application
@@ -59,7 +59,9 @@ int main(void)
     SYSTEM_Initialize();
     
     printf("\r\nStart test Wi-Fi\r\n");
-    winc_example();
+    wifi_connection();
+    weather_client_init();
+    weather_client_task();
 
     while (1)
     {

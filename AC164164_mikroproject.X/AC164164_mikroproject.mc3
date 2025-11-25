@@ -75,10 +75,10 @@
       </entry>
    </usedClasses>
    <usedLibraries class="java.util.ArrayList">
-      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.mcu16.Mcu16PeripheralLibrary" version="1.171.5"/>
-      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.libraries.networking.winc.library.WINCLibrary" version="1.1.2"/>
-      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.foundationservices.library.FoundationServicesLibrary" version="0.2.3"/>
       <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.boardsupportlibrary.BoardSuppportLibrary" version="1.12.0"/>
+      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.mcu16.Mcu16PeripheralLibrary" version="1.171.5"/>
+      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.foundationservices.library.FoundationServicesLibrary" version="0.2.3"/>
+      <ILibraryFile class="com.microchip.mcc.core.library.BaseLibraryFile" libraryClass="com.microchip.mcc.libraries.networking.winc.library.WINCLibrary" version="1.1.2"/>
    </usedLibraries>
    <tokenMap class="java.util.TreeMap">
       <entry>
@@ -2051,7 +2051,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="Custom Name RC5"/>
-         <value/>
+         <value>LED_BLUE</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="Custom Name RC6"/>
@@ -2235,7 +2235,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="RC5"/>
-         <value>disabled</value>
+         <value>output</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="RC6"/>
@@ -2471,7 +2471,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="customNameUserSet RC5"/>
-         <value>disabled</value>
+         <value>enabled</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="Pin Module" name="customNameUserSet RC6"/>
@@ -5943,7 +5943,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.RegisterKey" moduleName="Pin Module" registerAlias="TRISC"/>
-         <value>760</value>
+         <value>728</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="Pin Module" registerAlias="ANSA" settingAlias="ANSELA0"/>
@@ -7519,7 +7519,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="Pin Module" registerAlias="TRISC" settingAlias="TRISC5"/>
-         <value>input</value>
+         <value>output</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.SettingKey" moduleName="Pin Module" registerAlias="TRISC" settingAlias="TRISC6"/>
@@ -8435,11 +8435,11 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="SPIMASTER" name="pubSubSPIMASTERConfigurations"/>
-         <value>5660.334873160985</value>
+         <value>7630.864242797255</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="SPIMASTER" name="pubSubspiSubscriber"/>
-         <value>1996.1308311975633</value>
+         <value>7947.02429542368</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="SPIMASTER" name="spiSubscriber"/>
@@ -8451,7 +8451,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="SPIMASTER" name="validate"/>
-         <value>0.9704956251663167</value>
+         <value>0.2559631242502457</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.PropertyTokenKey" moduleName="SPIMASTER" name="spiConfigurations%0%dataInputSample"/>
@@ -9827,7 +9827,7 @@
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="WINC15XX" name="pubSubWINC15XX_SPIMASTER/interfaceV2"/>
-         <value>8999.455295137914</value>
+         <value>2699.3576194629786</value>
       </entry>
       <entry>
          <key class="com.microchip.mcc.core.tokenManager.CustomKey" moduleName="WINC15XX" name="ssid"/>
@@ -9937,15 +9937,15 @@
       </entry>
       <entry>
          <file>mcc_generated_files\mcc.h</file>
-         <hash>f3e3d6f2e95e33adf9f732690b43cc1987e8be934299167d83a7a4ee3f9da595</hash>
+         <hash>0b412525bc22ec8aa939e0d82cedd48968a52dcb3838212c1329c5d55cc1ffdf</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\pin_manager.c</file>
-         <hash>630cea8ec47580e8fccf06865a071dc39df8233acdcfedd393a8054402980657</hash>
+         <hash>48aec62648ed1c8f6961a51db0152a9ed65700f17a0a532dd5d6046158ba2055</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\pin_manager.h</file>
-         <hash>d4c96af7921dce9defac1fe7f349cd9ec8a749f7acfc4f55c48c1bb58b21c23b</hash>
+         <hash>1f5040a317cf437ef3266129fc60b1a2aa935f8870200d397a392276091fa1e2</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\spi1_driver.c</file>
@@ -9961,7 +9961,7 @@
       </entry>
       <entry>
          <file>mcc_generated_files\system.c</file>
-         <hash>11bccc688e8675a1bd1de5c8e6f0a5a9b75526dc35a6adf28dbf0895928e80de</hash>
+         <hash>e132bad736f5ef2ad912a3d5594ff02cc322ec96d7d4f22a095c2129d6f2925c</hash>
       </entry>
       <entry>
          <file>mcc_generated_files\system.h</file>

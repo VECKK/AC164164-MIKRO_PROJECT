@@ -51,14 +51,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "uart1.h"
-#include "drivers/spi_master.h"
-#include "delay.h"
 #include "tmr1.h"
 #include "spi1_driver.h"
 #include "ext_int.h"
+#include "drivers/spi_master.h"
 #include "interrupt_manager.h"
 #include "traps.h"
+#include "delay.h"
+#include "uart1.h"
 
 #warning "This file will be removed in future MCC releases. Use system.h instead."
 

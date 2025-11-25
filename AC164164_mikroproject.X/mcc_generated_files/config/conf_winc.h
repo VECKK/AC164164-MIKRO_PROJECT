@@ -70,7 +70,7 @@
 // <s> SSID
 // <i> Target WLAN SSID
 // <id> main_wlan_ssid
-#define CFG_MAIN_WLAN_SSID "UPC50B110"
+#define WLAN_SSID "Majki_WiFi_5G"
 
 // <y> Authentication
 // <i> Target WLAN Authentication
@@ -80,12 +80,12 @@
 // <M2M_WIFI_SEC_WEP"> Security type WEP (40 or 104) OPEN OR SHARED
 // <M2M_WIFI_SEC_802_1X"> Wi-Fi network is secured with WPA/WPA2 Enterprise.IEEE802.1x user-name/password authentication
 // <id> main_wlan_auth
-#define CFG_MAIN_WLAN_AUTH M2M_WIFI_SEC_WPA_PSK
+#define WLAN_AUTH M2M_WIFI_SEC_WPA_PSK
 
 // <s> Password
 // <i> Target WLAN password
 // <id> main_wlan_psk
-#define CFG_MAIN_WLAN_PSK "yws6npVtqeub"
+#define WLAN_PSK "MajkiInternet61"
 
 // </h>
 

@@ -35,49 +35,12 @@
  * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
  */
 
-#include "../mcc.h"
-#include "../winc/include/winc.h"
-#include "../winc/include/winc_legacy.h"
+#ifndef WIFI_CONNECTION_H_INCLUDED
+#define WIFI_CONNECTION_H_INCLUDED
+#include <stdbool.h>
 
-void winc_register_init(void);
+extern bool wifi_connected;
+void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg);
+void wifi_connection(void);
 
-void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
-{
-    switch(u8WiFiEvent)
-    {
-    case M2M_WIFI_RESP_CON_STATE_CHANGED:
-        {
-            // add custom code here
-        }
-        break;
-
-    default:
-        break;
-    }
-}
-
-void winc_example(void)
-{
-    winc_register_init();
-    winc_adapter_init();
-    tstrWifiInitParam   param;
-    
-    m2m_memset((uint8_t *)&param, 0, sizeof(param));
-    param.pfAppWifiCb   = wifi_event_cb;
-
-    int8_t ret = m2m_wifi_init(&param);
-    if (M2M_SUCCESS != ret){
-        while(1);
-    }
-    
-    ret = m2m_wifi_connect((char *)CFG_MAIN_WLAN_SSID, sizeof(CFG_MAIN_WLAN_SSID), CFG_MAIN_WLAN_AUTH, (void *)CFG_MAIN_WLAN_PSK, M2M_WIFI_CH_ALL);
-    
-    while(1)
-    {
-        m2m_wifi_handle_events(NULL);
-    }
-}
-
-void winc_register_init(void)
-{
-}
+#endif /* WIFI_CONNECTION_H_INCLUDED */

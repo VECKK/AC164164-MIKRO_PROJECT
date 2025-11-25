@@ -97,23 +97,23 @@
 #include "pin_manager.h"
 #include "clock.h"
 #include "system.h"
-#include "uart1.h"
-#include "drivers/spi_master.h"
-#include "delay.h"
 #include "tmr1.h"
 #include "spi1_driver.h"
 #include "ext_int.h"
+#include "drivers/spi_master.h"
 #include "interrupt_manager.h"
 #include "traps.h"
+#include "delay.h"
+#include "uart1.h"
 
 void SYSTEM_Initialize(void)
 {
     PIN_MANAGER_Initialize();
     CLOCK_Initialize();
     INTERRUPT_Initialize();
-    UART1_Initialize();
     TMR1_Initialize();
     EXT_INT_Initialize();
+    UART1_Initialize();
 }
 
 /**
