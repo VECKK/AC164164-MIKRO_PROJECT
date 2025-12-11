@@ -51,37 +51,66 @@
 #include    "mcc_generated_files/examples/wifi_connection.h"
 #include    "mcc_generated_files/examples/weather_client.h"
 #include    "ILI9341_files/tft_gfx.h"
+#include    "ILI9341_files/touch_sensor.h"
+
+// FCY dla main.c
+#define FCY 16000000UL 
+#include <libpic30.h>
 
 /*
                          Main application
  */
-int main(void)
-{
-    // initialize the device
+int main(void) {
     SYSTEM_Initialize();
     TFT_Init();
-
+    Touch_Init();
+    
+    uint16_t touchX = 0, touchY = 0;
+    
+    char buffer[32]; 
+    
     TFT_FillScreen(TFT_BLACK);
-
-    TFT_FillRect(10, 10, 50, 50, TFT_RED);       // Czerwony kwadrat
-    TFT_FillRect(70, 10, 50, 50, TFT_GREEN);     // Zielony kwadrat
-    TFT_FillRect(130, 10, 50, 50, TFT_BLUE);     // Niebieski kwadrat
-
-    TFT_Print(10, 80, "Hello PIC24!", TFT_WHITE, TFT_BLACK, 1);
     
+    TFT_Print(10, 110, "X:", TFT_WHITE, TFT_BLACK, 2);
+    TFT_Print(10, 140, "Y:", TFT_WHITE, TFT_BLACK, 2);
+    TFT_Print(10, 170, "Status:", TFT_WHITE, TFT_BLACK, 2);
     
-    TFT_Print(10, 130, "DUZY!", TFT_WHITE, TFT_RED, 3);
+    TFT_FillRect(10, 10, 50, 50, TFT_RED);       
+    TFT_FillRect(70, 10, 50, 50, TFT_GREEN);     
+    TFT_FillRect(130, 10, 50, 50, TFT_BLUE);     
+
+    TFT_Print(10, 80, "Touch Test", TFT_WHITE, TFT_BLACK, 1);
     
-    printf("\r\nStart test Wi-Fi\r\n");
-    wifi_connection();
-    weather_client_init();
-    weather_client_task();
+    while (1) {
+        
+        if (Touch_IsPressed())
+        {
+            if (Touch_GetCoordinates(&touchX, &touchY))
+            {
+                TFT_FillRect(touchX, touchY, 2, 2, TFT_YELLOW);
+            }
+            
+            TFT_Print(80, 170, "Pressed   ", TFT_GREEN, TFT_BLACK, 2);
+        }
+        else
+        {
+            TFT_Print(80, 170, "NotPressed", TFT_RED, TFT_BLACK, 2);
+        }
+        
+        sprintf(buffer, "%d   ", touchX); 
+        TFT_Print(50, 110, buffer, TFT_WHITE, TFT_BLACK, 2);
 
-    while (1)
-    {
-
+        sprintf(buffer, "%d   ", touchY);
+        TFT_Print(50, 140, buffer, TFT_WHITE, TFT_BLACK, 2);
+        
+        __delay_ms(100);
+        
+        
+    //    printf("\r\nStart test Wi-Fi\r\n");
+    //    wifi_connection();
+    //    weather_client_init();
+    //    weather_client_task();
     }
-
     return 1;
 }
 /**

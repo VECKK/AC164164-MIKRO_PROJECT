@@ -55,11 +55,5 @@ void INTERRUPT_Initialize (void)
     //    IOCI: IOC -  Interrupt On Change Interrupt
     //    Priority: 1
         IPC4bits.IOCIP = 1;
-    //    INT0I: INT0 - External Interrupt 0
-    //    Priority: 1
-        IPC0bits.INT0IP = 1;
-    //    INT4I: INT4 - External Interrupt 4
-    //    Priority: 1
-        IPC13bits.INT4IP = 1;
 
 }

@@ -6,6 +6,7 @@
                    projectFiles="true">
       <logicalFolder name="f1" displayName="ILI9341" projectFiles="true">
         <itemPath>ILI9341_files/tft_gfx.h</itemPath>
+        <itemPath>ILI9341_files/touch_sensor.h</itemPath>
       </logicalFolder>
       <logicalFolder name="MCC Generated Files"
                      displayName="MCC Generated Files"
@@ -68,7 +69,6 @@
         <itemPath>mcc_generated_files/mcc.h</itemPath>
         <itemPath>mcc_generated_files/system.h</itemPath>
         <itemPath>mcc_generated_files/clock.h</itemPath>
-        <itemPath>mcc_generated_files/ext_int.h</itemPath>
         <itemPath>mcc_generated_files/spi2.h</itemPath>
       </logicalFolder>
     </logicalFolder>
@@ -88,6 +88,7 @@
       <logicalFolder name="f1" displayName="ILI9341" projectFiles="true">
         <itemPath>ILI9341_files/glcdfont.c</itemPath>
         <itemPath>ILI9341_files/tft_gfx.c</itemPath>
+        <itemPath>ILI9341_files/touch_sensor.c</itemPath>
       </logicalFolder>
       <logicalFolder name="MCC Generated Files"
                      displayName="MCC Generated Files"
@@ -137,7 +138,6 @@
         <itemPath>mcc_generated_files/mcc.c</itemPath>
         <itemPath>mcc_generated_files/system.c</itemPath>
         <itemPath>mcc_generated_files/clock.c</itemPath>
-        <itemPath>mcc_generated_files/ext_int.c</itemPath>
         <itemPath>mcc_generated_files/spi2.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>

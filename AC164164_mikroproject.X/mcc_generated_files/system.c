@@ -97,13 +97,12 @@
 #include "pin_manager.h"
 #include "clock.h"
 #include "system.h"
-#include "ext_int.h"
-#include "drivers/spi_master.h"
-#include "spi2.h"
+#include "delay.h"
 #include "spi1_driver.h"
 #include "interrupt_manager.h"
 #include "traps.h"
-#include "delay.h"
+#include "spi2.h"
+#include "drivers/spi_master.h"
 
 void SYSTEM_Initialize(void)
 {
@@ -111,7 +110,6 @@ void SYSTEM_Initialize(void)
     CLOCK_Initialize();
     INTERRUPT_Initialize();
     SPI2_Initialize();
-    EXT_INT_Initialize();
 }
 
 /**
