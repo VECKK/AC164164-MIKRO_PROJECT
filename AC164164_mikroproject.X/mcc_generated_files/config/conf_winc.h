@@ -70,7 +70,7 @@
 // <s> SSID
 // <i> Target WLAN SSID
 // <id> main_wlan_ssid
-#define WLAN_SSID "Majki_WiFi_5G"
+#define WLAN_SSID "iPhone"//"Majki_WiFi_5G"
 
 // <y> Authentication
 // <i> Target WLAN Authentication
@@ -85,7 +85,7 @@
 // <s> Password
 // <i> Target WLAN password
 // <id> main_wlan_psk
-#define WLAN_PSK "MajkiInternet61"
+#define WLAN_PSK "wik 1234"//"MajkiInternet61"
 
 // </h>
 

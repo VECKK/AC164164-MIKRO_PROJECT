@@ -47,8 +47,10 @@
 */
 #include    <stdio.h>
 #include    "../system.h"
+#include    "mcc_generated_files/system.h"
 #include    "mcc_generated_files/examples/wifi_connection.h"
 #include    "mcc_generated_files/examples/weather_client.h"
+#include    "ILI9341_files/tft_gfx.h"
 
 /*
                          Main application
@@ -57,6 +59,18 @@ int main(void)
 {
     // initialize the device
     SYSTEM_Initialize();
+    TFT_Init();
+
+    TFT_FillScreen(TFT_BLACK);
+
+    TFT_FillRect(10, 10, 50, 50, TFT_RED);       // Czerwony kwadrat
+    TFT_FillRect(70, 10, 50, 50, TFT_GREEN);     // Zielony kwadrat
+    TFT_FillRect(130, 10, 50, 50, TFT_BLUE);     // Niebieski kwadrat
+
+    TFT_Print(10, 80, "Hello PIC24!", TFT_WHITE, TFT_BLACK, 1);
+    
+    
+    TFT_Print(10, 130, "DUZY!", TFT_WHITE, TFT_RED, 3);
     
     printf("\r\nStart test Wi-Fi\r\n");
     wifi_connection();

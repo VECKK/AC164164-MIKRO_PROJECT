@@ -85,7 +85,7 @@
 #pragma config DNVPEN = ENABLE    //Downside Voltage Protection Enable bit->Downside protection enabled using ZPBOR when BOR is inactive
 
 // FICD
-#pragma config ICS = PGD1    //ICD Communication Channel Select bits->Communicate on PGEC1 and PGED1
+#pragma config ICS = PGD2    //ICD Communication Channel Select bits->Communicate on PGEC2 and PGED2
 #pragma config JTAGEN = OFF    //JTAG Enable bit->JTAG is disabled
 
 // FDEVOPT1
@@ -97,23 +97,21 @@
 #include "pin_manager.h"
 #include "clock.h"
 #include "system.h"
-#include "tmr1.h"
-#include "spi1_driver.h"
 #include "ext_int.h"
 #include "drivers/spi_master.h"
+#include "spi2.h"
+#include "spi1_driver.h"
 #include "interrupt_manager.h"
 #include "traps.h"
 #include "delay.h"
-#include "uart1.h"
 
 void SYSTEM_Initialize(void)
 {
     PIN_MANAGER_Initialize();
     CLOCK_Initialize();
     INTERRUPT_Initialize();
-    TMR1_Initialize();
+    SPI2_Initialize();
     EXT_INT_Initialize();
-    UART1_Initialize();
 }
 
 /**

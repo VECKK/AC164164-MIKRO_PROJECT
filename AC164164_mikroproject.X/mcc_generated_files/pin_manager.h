@@ -56,6 +56,298 @@
 */
 /**
   @Summary
+    Sets the GPIO pin, RA0, high using LATA0.
+
+  @Description
+    Sets the GPIO pin, RA0, high using LATA0.
+
+  @Preconditions
+    The RA0 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RA0 high (1)
+    TFT_CS_SetHigh();
+    </code>
+
+*/
+#define TFT_CS_SetHigh()          (_LATA0 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RA0, low using LATA0.
+
+  @Description
+    Sets the GPIO pin, RA0, low using LATA0.
+
+  @Preconditions
+    The RA0 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RA0 low (0)
+    TFT_CS_SetLow();
+    </code>
+
+*/
+#define TFT_CS_SetLow()           (_LATA0 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RA0, using LATA0.
+
+  @Description
+    Toggles the GPIO pin, RA0, using LATA0.
+
+  @Preconditions
+    The RA0 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RA0
+    TFT_CS_Toggle();
+    </code>
+
+*/
+#define TFT_CS_Toggle()           (_LATA0 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RA0.
+
+  @Description
+    Reads the value of the GPIO pin, RA0.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RA0
+    postValue = TFT_CS_GetValue();
+    </code>
+
+*/
+#define TFT_CS_GetValue()         _RA0
+/**
+  @Summary
+    Configures the GPIO pin, RA0, as an input.
+
+  @Description
+    Configures the GPIO pin, RA0, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RA0 as an input
+    TFT_CS_SetDigitalInput();
+    </code>
+
+*/
+#define TFT_CS_SetDigitalInput()  (_TRISA0 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RA0, as an output.
+
+  @Description
+    Configures the GPIO pin, RA0, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RA0 as an output
+    TFT_CS_SetDigitalOutput();
+    </code>
+
+*/
+#define TFT_CS_SetDigitalOutput() (_TRISA0 = 0)
+/**
+  @Summary
+    Sets the GPIO pin, RA1, high using LATA1.
+
+  @Description
+    Sets the GPIO pin, RA1, high using LATA1.
+
+  @Preconditions
+    The RA1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RA1 high (1)
+    SCK2OUT_SetHigh();
+    </code>
+
+*/
+#define SCK2OUT_SetHigh()          (_LATA1 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RA1, low using LATA1.
+
+  @Description
+    Sets the GPIO pin, RA1, low using LATA1.
+
+  @Preconditions
+    The RA1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RA1 low (0)
+    SCK2OUT_SetLow();
+    </code>
+
+*/
+#define SCK2OUT_SetLow()           (_LATA1 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RA1, using LATA1.
+
+  @Description
+    Toggles the GPIO pin, RA1, using LATA1.
+
+  @Preconditions
+    The RA1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RA1
+    SCK2OUT_Toggle();
+    </code>
+
+*/
+#define SCK2OUT_Toggle()           (_LATA1 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RA1.
+
+  @Description
+    Reads the value of the GPIO pin, RA1.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RA1
+    postValue = SCK2OUT_GetValue();
+    </code>
+
+*/
+#define SCK2OUT_GetValue()         _RA1
+/**
+  @Summary
+    Configures the GPIO pin, RA1, as an input.
+
+  @Description
+    Configures the GPIO pin, RA1, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RA1 as an input
+    SCK2OUT_SetDigitalInput();
+    </code>
+
+*/
+#define SCK2OUT_SetDigitalInput()  (_TRISA1 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RA1, as an output.
+
+  @Description
+    Configures the GPIO pin, RA1, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RA1 as an output
+    SCK2OUT_SetDigitalOutput();
+    </code>
+
+*/
+#define SCK2OUT_SetDigitalOutput() (_TRISA1 = 0)
+/**
+  @Summary
     Sets the GPIO pin, RA12, high using LATA12.
 
   @Description
@@ -786,6 +1078,298 @@
 #define WAKE_SetDigitalOutput() (_TRISA8 = 0)
 /**
   @Summary
+    Sets the GPIO pin, RB1, high using LATB1.
+
+  @Description
+    Sets the GPIO pin, RB1, high using LATB1.
+
+  @Preconditions
+    The RB1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB1 high (1)
+    SDO2_SetHigh();
+    </code>
+
+*/
+#define SDO2_SetHigh()          (_LATB1 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RB1, low using LATB1.
+
+  @Description
+    Sets the GPIO pin, RB1, low using LATB1.
+
+  @Preconditions
+    The RB1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB1 low (0)
+    SDO2_SetLow();
+    </code>
+
+*/
+#define SDO2_SetLow()           (_LATB1 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RB1, using LATB1.
+
+  @Description
+    Toggles the GPIO pin, RB1, using LATB1.
+
+  @Preconditions
+    The RB1 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RB1
+    SDO2_Toggle();
+    </code>
+
+*/
+#define SDO2_Toggle()           (_LATB1 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RB1.
+
+  @Description
+    Reads the value of the GPIO pin, RB1.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RB1
+    postValue = SDO2_GetValue();
+    </code>
+
+*/
+#define SDO2_GetValue()         _RB1
+/**
+  @Summary
+    Configures the GPIO pin, RB1, as an input.
+
+  @Description
+    Configures the GPIO pin, RB1, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB1 as an input
+    SDO2_SetDigitalInput();
+    </code>
+
+*/
+#define SDO2_SetDigitalInput()  (_TRISB1 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RB1, as an output.
+
+  @Description
+    Configures the GPIO pin, RB1, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB1 as an output
+    SDO2_SetDigitalOutput();
+    </code>
+
+*/
+#define SDO2_SetDigitalOutput() (_TRISB1 = 0)
+/**
+  @Summary
+    Sets the GPIO pin, RB15, high using LATB15.
+
+  @Description
+    Sets the GPIO pin, RB15, high using LATB15.
+
+  @Preconditions
+    The RB15 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB15 high (1)
+    TFT_RST_SetHigh();
+    </code>
+
+*/
+#define TFT_RST_SetHigh()          (_LATB15 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RB15, low using LATB15.
+
+  @Description
+    Sets the GPIO pin, RB15, low using LATB15.
+
+  @Preconditions
+    The RB15 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RB15 low (0)
+    TFT_RST_SetLow();
+    </code>
+
+*/
+#define TFT_RST_SetLow()           (_LATB15 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RB15, using LATB15.
+
+  @Description
+    Toggles the GPIO pin, RB15, using LATB15.
+
+  @Preconditions
+    The RB15 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RB15
+    TFT_RST_Toggle();
+    </code>
+
+*/
+#define TFT_RST_Toggle()           (_LATB15 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RB15.
+
+  @Description
+    Reads the value of the GPIO pin, RB15.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RB15
+    postValue = TFT_RST_GetValue();
+    </code>
+
+*/
+#define TFT_RST_GetValue()         _RB15
+/**
+  @Summary
+    Configures the GPIO pin, RB15, as an input.
+
+  @Description
+    Configures the GPIO pin, RB15, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB15 as an input
+    TFT_RST_SetDigitalInput();
+    </code>
+
+*/
+#define TFT_RST_SetDigitalInput()  (_TRISB15 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RB15, as an output.
+
+  @Description
+    Configures the GPIO pin, RB15, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RB15 as an output
+    TFT_RST_SetDigitalOutput();
+    </code>
+
+*/
+#define TFT_RST_SetDigitalOutput() (_TRISB15 = 0)
+/**
+  @Summary
     Sets the GPIO pin, RC0, high using LATC0.
 
   @Description
@@ -1368,6 +1952,152 @@
 
 */
 #define LED_BLUE_SetDigitalOutput() (_TRISC5 = 0)
+/**
+  @Summary
+    Sets the GPIO pin, RC6, high using LATC6.
+
+  @Description
+    Sets the GPIO pin, RC6, high using LATC6.
+
+  @Preconditions
+    The RC6 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC6 high (1)
+    TFT_DC_SetHigh();
+    </code>
+
+*/
+#define TFT_DC_SetHigh()          (_LATC6 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RC6, low using LATC6.
+
+  @Description
+    Sets the GPIO pin, RC6, low using LATC6.
+
+  @Preconditions
+    The RC6 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC6 low (0)
+    TFT_DC_SetLow();
+    </code>
+
+*/
+#define TFT_DC_SetLow()           (_LATC6 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RC6, using LATC6.
+
+  @Description
+    Toggles the GPIO pin, RC6, using LATC6.
+
+  @Preconditions
+    The RC6 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RC6
+    TFT_DC_Toggle();
+    </code>
+
+*/
+#define TFT_DC_Toggle()           (_LATC6 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RC6.
+
+  @Description
+    Reads the value of the GPIO pin, RC6.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RC6
+    postValue = TFT_DC_GetValue();
+    </code>
+
+*/
+#define TFT_DC_GetValue()         _RC6
+/**
+  @Summary
+    Configures the GPIO pin, RC6, as an input.
+
+  @Description
+    Configures the GPIO pin, RC6, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC6 as an input
+    TFT_DC_SetDigitalInput();
+    </code>
+
+*/
+#define TFT_DC_SetDigitalInput()  (_TRISC6 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RC6, as an output.
+
+  @Description
+    Configures the GPIO pin, RC6, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC6 as an output
+    TFT_DC_SetDigitalOutput();
+    </code>
+
+*/
+#define TFT_DC_SetDigitalOutput() (_TRISC6 = 0)
 
 /**
     Section: Function Prototypes

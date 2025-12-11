@@ -10,6 +10,7 @@
             <make-dep-projects/>
             <sourceRootList>
                 <sourceRootElem>mcc_generated_files/examples</sourceRootElem>
+                <sourceRootElem>ILI9341_files</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

@@ -107,7 +107,6 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
             if (pState->u8CurrState == M2M_WIFI_CONNECTED)
             {
                 printf("Connected to the network! Waiting for DHCP address...\r\n");
-                LED_BLUE_SetLow();
             }
             else if (pState->u8CurrState == M2M_WIFI_DISCONNECTED)
             {
@@ -125,6 +124,7 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
             wifi_connected = true;
             printf("IP address received: %u.%u.%u.%u\r\n",
                    ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+            LED_BLUE_SetLow();
             break;
         }
 

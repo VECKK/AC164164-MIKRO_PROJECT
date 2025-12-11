@@ -6,6 +6,7 @@
 
 #include "../examples/wifi_connection.h"
 #include "../winc/socket/socket.h"
+#include "../../ILI9341_files/tft_gfx.h"
 
 /* ===================== KONFIG ===================== */
 #define WEATHER_SERVER_NAME   "api.openweathermap.org"
@@ -37,7 +38,6 @@ void weather_client_init(void)
 
 void weather_client_task(void)
 {
-    /* Uruchom tylko je?li Wi-Fi po??czone i jeszcze nie po??czono z serwerem */
     if (wifi_connected && !connection_ready)
     {
         printf("[WEATHER] Resolving server %s...\r\n", WEATHER_SERVER_NAME);
@@ -170,10 +170,12 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                     }
                 }
 
-                printf("City: %s\r\nTemperature: %s C\r\nCondition: %s\r\n",
-                    city, temp, cond);
+            char buffer[128];
 
-                // zamkni?cie socketu
+            sprintf(buffer, "City: %s Temperature: %s", city, temp);
+        
+                TFT_Print(10, 100, buffer, TFT_YELLOW, TFT_BLACK, 1);
+
                 close(tcp_client_socket);
                 tcp_client_socket = -1;
                 connection_ready = false;
