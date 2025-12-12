@@ -57,59 +57,62 @@
 #define FCY 16000000UL 
 #include <libpic30.h>
 
-/*
-                         Main application
- */
-int main(void) {
-    SYSTEM_Initialize();
-    TFT_Init();
-    Touch_Init();
-    
-    uint16_t touchX = 0, touchY = 0;
-    
-    char buffer[32]; 
-    
-    TFT_FillScreen(TFT_BLACK);
-    
-    TFT_Print(10, 110, "X:", TFT_WHITE, TFT_BLACK, 2);
-    TFT_Print(10, 140, "Y:", TFT_WHITE, TFT_BLACK, 2);
-    TFT_Print(10, 170, "Status:", TFT_WHITE, TFT_BLACK, 2);
-    
-    TFT_FillRect(10, 10, 50, 50, TFT_RED);       
-    TFT_FillRect(70, 10, 50, 50, TFT_GREEN);     
-    TFT_FillRect(130, 10, 50, 50, TFT_BLUE);     
 
-    TFT_Print(10, 80, "Touch Test", TFT_WHITE, TFT_BLACK, 1);
-    
-    while (1) {
-        
-        if (Touch_IsPressed())
+void Test_Touch_Init(){
+    TFT_Print(150, 130, "X:", TFT_WHITE, TFT_BLACK, 2);;
+    TFT_Print(150, 160, "Y:", TFT_WHITE, TFT_BLACK, 2);
+    TFT_Print(150, 190, "Status:", TFT_WHITE, TFT_BLACK, 1);      
+
+    TFT_Print(150, 100, "Touch Test", TFT_WHITE, TFT_BLACK, 2);
+}
+
+void Test_Touch(char buffer[], uint16_t touchX, uint16_t touchY){
+    if (Touch_IsPressed())
         {
             if (Touch_GetCoordinates(&touchX, &touchY))
             {
                 TFT_FillRect(touchX, touchY, 2, 2, TFT_YELLOW);
             }
             
-            TFT_Print(80, 170, "Pressed   ", TFT_GREEN, TFT_BLACK, 2);
+            TFT_Print(196, 190, "Pressed   ", TFT_GREEN, TFT_BLACK, 1);
         }
         else
         {
-            TFT_Print(80, 170, "NotPressed", TFT_RED, TFT_BLACK, 2);
+            TFT_Print(196, 190, "NotPressed", TFT_RED, TFT_BLACK, 1);
         }
         
         sprintf(buffer, "%d   ", touchX); 
-        TFT_Print(50, 110, buffer, TFT_WHITE, TFT_BLACK, 2);
+        TFT_Print(200, 130, buffer, TFT_WHITE, TFT_BLACK, 2);
 
         sprintf(buffer, "%d   ", touchY);
-        TFT_Print(50, 140, buffer, TFT_WHITE, TFT_BLACK, 2);
+        TFT_Print(200, 160, buffer, TFT_WHITE, TFT_BLACK, 2);
+}
+
+
+/*
+            Main application
+ */
+int main(void) {
+    SYSTEM_Initialize();
+    TFT_Init();
+    Touch_Init();
+    //==Variables_Initialize==//
+    uint16_t touchX = 0, touchY = 0;
+    char buffer[32]; 
+    //========================//
+    //==Background_Initialize==//
+    TFT_FillScreen(TFT_BLACK);
+    Test_Touch_Init();
+    wifi_setup();
+    weather_client_init();
+    //========================//
+    
+    while (1) {
+        Test_Touch(buffer, touchX, touchY);
         
-        __delay_ms(100);
-        
-        
-    //    printf("\r\nStart test Wi-Fi\r\n");
-    //    wifi_connection();
-    //    weather_client_init();
-    //    weather_client_task();
+        wifi_task();
+        weather_client_task();
+        __delay_ms(1000);
     }
     return 1;
 }

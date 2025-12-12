@@ -1,63 +1,28 @@
-/**
- *
- * \file
- *
- * \brief WINC1500 Example.
- *
- * Copyright (c) 2018 Microchip Technology Inc. and its subsidiaries.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Subject to your compliance with these terms, you may use Microchip
- * software and any derivatives exclusively with Microchip products.
- * It is your responsibility to comply with third party license terms applicable
- * to your use of third party software (including open source software) that
- * may accompany Microchip software.
- *
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES,
- * WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE,
- * INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY,
- * AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL MICROCHIP BE
- * LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, INCIDENTAL OR CONSEQUENTIAL
- * LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND WHATSOEVER RELATED TO THE
- * SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS BEEN ADVISED OF THE
- * POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE FULLEST EXTENT
- * ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN ANY WAY
- * RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
- * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *
- * \asf_license_stop
- *
- */
-/*
- * Support and FAQ: visit <a href="https://www.microchip.com/support/">Microchip Support</a>
- */
-
 #include <stdio.h>
 #include <string.h>
 #include "../mcc.h"
 #include "../winc/include/winc.h"
 #include "../winc/include/winc_legacy.h"
 #include "../pin_manager.h"
+#include "wifi_connection.h"
+// Dodajemy obs?ug? ekranu tutaj, aby wy?wietla? status
+#include "../../ILI9341_files/tft_gfx.h"
 
 /* ===================== PROTOTYPY ===================== */
 void winc_register_init(void);
-static void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg);
 
 /* ===================== ZMIENNE GLOBALNE ===================== */
 bool wifi_connected = false;
+static char status_buffer[64]; // Bufor na komunikaty statusowe
 
 /* ===================== FUNKCJE ===================== */
 
 /**
- * Initialization function and Wi-Fi connection
+ * Initialization function (NON-BLOCKING)
  */
-
-void wifi_connection(void)
+void wifi_setup(void)
 {
-    printf("\r\nModule initialization...\r\n");
+    TFT_Print(10, 10, "Init Wi-Fi...", TFT_WHITE, TFT_BLACK, 1);
 
     winc_register_init();
     winc_adapter_init();
@@ -70,12 +35,14 @@ void wifi_connection(void)
     int8_t ret = m2m_wifi_init(&param);
     if (ret != M2M_SUCCESS)
     {
-        printf("Wi-Fi initialization error! Code: %d\r\n", ret);
-        while(1);
+        TFT_Print(10, 20, "Wi-Fi Init Error!", TFT_RED, TFT_BLACK, 1);
+        while(1); // Tu zostawiamy while tylko dla b??du krytycznego sprz?tu
     }
 
     /* Wi-Fi connection */
-    printf("Connecting to a Wi-Fi network: %s\r\n", WLAN_SSID);
+    sprintf(status_buffer, "Connecting to: %s", WLAN_SSID);
+    TFT_Print(10, 20, status_buffer, TFT_WHITE, TFT_BLACK, 1);
+
     ret = m2m_wifi_connect((char *)WLAN_SSID,
                            strlen(WLAN_SSID),
                            WLAN_AUTH,
@@ -83,20 +50,22 @@ void wifi_connection(void)
                            M2M_WIFI_CH_ALL);
     if (ret != M2M_SUCCESS)
     {
-        printf("Connection error! Code: %d\r\n", ret);
-        while(1);
-    }
-
-    while(1)
-    {
-        m2m_wifi_handle_events(NULL);
+        TFT_Print(10, 30, "Conn. Error!", TFT_RED, TFT_BLACK, 1);
     }
 }
 
 /**
- *  Callback Wi-Fi
+ * To funkcja, któr? musisz wywo?ywa? w p?tli while(1) w main()
  */
+void wifi_task(void)
+{
+    // Obs?uga zdarze? Wi-Fi (nieblokuj?ca)
+    m2m_wifi_handle_events(NULL);
+}
 
+/**
+ * Callback Wi-Fi
+ */
 void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
 {
     switch(u8WiFiEvent)
@@ -106,11 +75,11 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
             tstrM2mWifiStateChanged *pState = (tstrM2mWifiStateChanged *)pvMsg;
             if (pState->u8CurrState == M2M_WIFI_CONNECTED)
             {
-                printf("Connected to the network! Waiting for DHCP address...\r\n");
+                TFT_Print(10, 30, "Wi-Fi Connected! Wait DHCP...", TFT_GREEN, TFT_BLACK, 1);
             }
             else if (pState->u8CurrState == M2M_WIFI_DISCONNECTED)
             {
-                printf("Disconnected. Attempting to reconnect...\r\n");
+                TFT_Print(10, 30, "Disconnected! Reconnecting...", TFT_RED, TFT_BLACK, 1);
                 wifi_connected = false;
                 m2m_wifi_connect((char *)WLAN_SSID, strlen(WLAN_SSID),
                                  WLAN_AUTH, (void *)WLAN_PSK, M2M_WIFI_CH_ALL);
@@ -122,8 +91,12 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
         {
             uint8_t *ipAddr = (uint8_t *)pvMsg;
             wifi_connected = true;
-            printf("IP address received: %u.%u.%u.%u\r\n",
-                   ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+            
+            // Wy?wietlenie IP na ekranie
+            sprintf(status_buffer, "IP: %u.%u.%u.%u", 
+                    ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+            TFT_Print(10, 40, status_buffer, TFT_CYAN, TFT_BLACK, 1);
+            
             LED_BLUE_SetLow();
             break;
         }
