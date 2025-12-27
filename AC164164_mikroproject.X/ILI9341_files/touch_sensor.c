@@ -137,3 +137,8 @@ bool Touch_GetCoordinates(uint16_t *x_pos, uint16_t *y_pos) {
 
     return true;
 }
+
+// Sprawdza czy dotyk by? wewn?trz przycisku
+bool Is_Btn_Pressed(uint16_t tx, uint16_t ty, uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+    return (tx >= x && tx <= (x + w) && ty >= y && ty <= (y + h));
+}

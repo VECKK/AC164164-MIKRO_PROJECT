@@ -41,8 +41,6 @@ void weather_client_task(void)
     // Uruchamiamy pobieranie tylko gdy jest Wi-Fi i nie jeste?my w trakcie po??czenia
     if (wifi_connected && !connection_ready && tcp_client_socket == -1)
     {
-        TFT_FillRect(10, 50, 180, 10, TFT_BLACK);
-        TFT_Print(10, 50, "Resolving DNS...", TFT_YELLOW, TFT_BLACK, 1);
         registerSocketCallback(socket_cb, resolve_cb);
         gethostbyname((const char *)WEATHER_SERVER_NAME);
         
@@ -61,13 +59,11 @@ static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP)
         weather_server_ip = u32ServerIP;
         server_resolved = true;
         
-        TFT_Print(10, 50, "DNS OK. Opening Socket...", TFT_GREEN, TFT_BLACK, 1);
 
         /* Open socket TCP */
         tcp_client_socket = socket(AF_INET, SOCK_STREAM, 0);
         if (tcp_client_socket < 0)
         {
-            TFT_Print(10, 60, "Socket Error!", TFT_RED, TFT_BLACK, 1);
             connection_ready = false; 
             return;
         }
@@ -79,13 +75,11 @@ static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP)
 
         if (connect(tcp_client_socket, (struct sockaddr *)&addr, sizeof(addr)) != SOCK_ERR_NO_ERROR)
         {
-            TFT_Print(10, 60, "Connect Error!", TFT_RED, TFT_BLACK, 1);
             connection_ready = false;
         }
     }
     else
     {
-        TFT_Print(10, 50, "DNS Failed!", TFT_RED, TFT_BLACK, 1);
         connection_ready = false;
     }
 }
@@ -99,7 +93,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
         case SOCKET_MSG_CONNECT:
             if (pstrConnect && pstrConnect->s8Error == SOCK_ERR_NO_ERROR)
             {
-                TFT_Print(10, 60, "Sending Request...", TFT_CYAN, TFT_BLACK, 1);
                 
                 // Zmiana: Pe?niejszy nag?ówek HTTP
                 memset(http_request, 0, BUFFER_SIZE);
@@ -115,7 +108,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
             }
             else
             {
-                TFT_Print(10, 60, "Conn. Failed!", TFT_RED, TFT_BLACK, 1);
                 close(tcp_client_socket);
                 tcp_client_socket = -1;
                 connection_ready = false;
@@ -124,7 +116,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
             
         case SOCKET_MSG_SEND:
         {
-            TFT_Print(10, 70, "Sent! Listening...", TFT_MAGENTA, TFT_BLACK, 1);
             
             // Mówimy modu?owi: "Jestem gotowy na dane, wrzu? je do recv_buffer"
             recv(tcp_client_socket, recv_buffer, sizeof(recv_buffer), 0);

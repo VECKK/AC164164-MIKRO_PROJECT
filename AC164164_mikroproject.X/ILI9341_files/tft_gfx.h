@@ -29,25 +29,25 @@ void TFT_FillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color
 void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, uint8_t size);
 void TFT_Print(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, uint8_t size);
 
-// Kolory (RGB565)
+// Kolory (BGR565) - Skorygowane dla wy?wietlaczy z odwróconym R/B
 #define TFT_BLACK       0x0000
-#define TFT_NAVY        0x000F
+#define TFT_NAVY        0x7800  
 #define TFT_DARKGREEN   0x03E0
-#define TFT_DARKCYAN    0x03EF
-#define TFT_MAROON      0x7800
-#define TFT_PURPLE      0x780F
-#define TFT_OLIVE       0x7BE0
-#define TFT_LIGHTGREY   0xC618
+#define TFT_DARKCYAN    0x7BE0  
+#define TFT_MAROON      0x000F  
+#define TFT_PURPLE      0x780F  
+#define TFT_OLIVE       0x03EF  
+#define TFT_LIGHTGREY   0xC618  
 #define TFT_DARKGREY    0x7BEF
-#define TFT_BLUE        0x001F
+#define TFT_BLUE        0xF800  
 #define TFT_GREEN       0x07E0
-#define TFT_CYAN        0x07FF
-#define TFT_RED         0xF800
+#define TFT_CYAN        0xFFE0  
+#define TFT_RED         0x001F  
 #define TFT_MAGENTA     0xF81F
-#define TFT_YELLOW      0xFFE0
+#define TFT_YELLOW      0x07FF  
 #define TFT_WHITE       0xFFFF
-#define TFT_ORANGE      0xFD20
-#define TFT_GREENYELLOW 0xAFE5
+#define TFT_ORANGE      0x053F  
+#define TFT_GREENYELLOW 0x2FF5  
 #define TFT_PINK        0xF81F
 
 #endif /* TFT_GFX_H */
