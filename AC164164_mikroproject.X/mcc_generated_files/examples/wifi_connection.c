@@ -5,28 +5,121 @@
 #include "../winc/include/winc_legacy.h"
 #include "../pin_manager.h"
 #include "wifi_connection.h"
-// Dodajemy obs?ug? ekranu tutaj, aby wy?wietla? status
-#include "../../ILI9341_files/tft_gfx.h"
 
+// Do??czamy grafik?
+#include "../../ILI9341_files/tft_gfx.h" 
+
+// --- KONFIGURACJA WYGL?DU PRZYCISKÓW ---
+#define BTN_START_X      10   
+#define BTN_START_Y      40   
+#define BTN_WIDTH        220  
+#define BTN_HEIGHT       30   
+#define BTN_GAP          10   
+
+// Tekst statusu
 #define TEXT_X 20
-#define TEXT_Y 190
+#define TEXT_Y 240 
 
-/* ===================== PROTOTYPY ===================== */
+// --- DANE SIECI ---
+typedef struct {
+    char* ssid;
+    char* pass;
+} NetworkCreds;
+
+NetworkCreds myNetworks[4] = {
+    {"UPC20B118",          "yws6npVtqeub"},
+    {"iPhone",             "wik 1234"},
+    {"Majki_WiFi_5G",      "MajkiInternet61"},
+    {"Gonsi S23 Ultra 5G", "12345678"}
+};
+
+// --- ZMIENNE GLOBALNE ---
+bool wifi_connected = false;
+bool wifi_connect_error = false;
+static char status_buffer[64];
+
+// --- FUNKCJE WEWN?TRZNE (POMOCNICZE) ---
 void winc_register_init(void);
 
-/* ===================== ZMIENNE GLOBALNE ===================== */
-bool wifi_connected = false;
-static char status_buffer[64]; // Bufor na komunikaty statusowe
+// Funkcja prywatna w tym pliku
+void wifi_connect_dynamic(char* ssid, char* password) {
+    // Resetujemy flagi przed now? prób?
+    wifi_connected = false;
+    wifi_connect_error = false; 
+    
+    m2m_wifi_disconnect(); 
+    
+    // 1. Czyszczenie paska statusu (wi?kszy obszar, bo b?d? 2 linie tekstu)
+    TFT_FillRect(0, TEXT_Y, 240, 50, TFT_BLACK); 
+    
+    // 2. Wy?wietlenie wybranej sieci (Linia 1)
+    sprintf(status_buffer, "Wybrano: %s", ssid);
+    TFT_Print(TEXT_X, TEXT_Y, status_buffer, TFT_CYAN, TFT_BLACK, 1);
 
-/* ===================== FUNKCJE ===================== */
+    // 3. Wy?wietlenie statusu szukania (Linia 2)
+    // To informuje u?ytkownika, ?e urz?dzenie pracuje
+    TFT_Print(TEXT_X, TEXT_Y + 15, "Szukanie sieci... Czekaj", TFT_WHITE, TFT_BLACK, 1);
 
-/**
- * Initialization function (NON-BLOCKING)
- */
+    int8_t ret = m2m_wifi_connect(ssid, strlen(ssid),
+                            M2M_WIFI_SEC_WPA_PSK, 
+                            (void *)password, 
+                            M2M_WIFI_CH_ALL);
+
+    if (ret != M2M_SUCCESS) {
+        TFT_Print(TEXT_X, TEXT_Y + 30, "Blad inicjalizacji!", TFT_RED, TFT_BLACK, 1);
+        wifi_connect_error = true; 
+    }
+}
+
+// --- FUNKCJE GUI (Dost?pne dla main.c) ---
+
+void Draw_Wifi_Menu(void) {
+    TFT_FillScreen(TFT_BLACK);
+    TFT_Print(10, 10, "WYBIERZ SIEC WI-FI:", TFT_YELLOW, TFT_BLACK, 2);
+    
+    for(int i=0; i<4; i++) {
+        uint16_t y_pos = BTN_START_Y + (i * (BTN_HEIGHT + BTN_GAP));
+        
+        // Ramka
+        TFT_DrawRect(BTN_START_X, y_pos, BTN_WIDTH, BTN_HEIGHT, TFT_WHITE);
+        
+        // Tekst
+        TFT_Print(BTN_START_X + 10, y_pos + (BTN_HEIGHT / 2) - 4, myNetworks[i].ssid, TFT_CYAN, TFT_BLACK, 1);
+    }
+}
+
+void Wifi_Highlight_Button(int index, uint16_t color) {
+    if (index < 0 || index >= 4) return;
+
+    // Obliczamy pozycj? Y dok?adnie tak samo jak w Draw_Wifi_Menu
+    uint16_t y_pos = BTN_START_Y + (index * (BTN_HEIGHT + BTN_GAP));
+    
+    // Rysujemy ramk? w nowym kolorze (np. TFT_RED)
+    TFT_DrawRect(BTN_START_X, y_pos, BTN_WIDTH, BTN_HEIGHT, color);
+}
+
+int Check_Wifi_Touch(uint16_t ty) {
+    for(int i=0; i<4; i++) {
+        uint16_t y_start = BTN_START_Y + (i * (BTN_HEIGHT + BTN_GAP));
+        uint16_t y_end = y_start + BTN_HEIGHT;
+
+        if (ty >= y_start && ty <= y_end) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void Wifi_Connect_Selection(int index) {
+    if(index >= 0 && index < 4) {
+        wifi_connect_dynamic(myNetworks[index].ssid, myNetworks[index].pass);
+    }
+}
+
+// --- FUNKCJE SYSTEMOWE WINC1500 ---
+
 void wifi_setup(void)
 {
-    TFT_Print(TEXT_X, TEXT_Y, "Init Wi-Fi...", TFT_WHITE, TFT_BLACK, 1);
-
     winc_register_init();
     winc_adapter_init();
 
@@ -34,41 +127,17 @@ void wifi_setup(void)
     memset(&param, 0, sizeof(param));
     param.pfAppWifiCb = wifi_event_cb;
 
-    /* Wi-Fi initialization */
     int8_t ret = m2m_wifi_init(&param);
-    if (ret != M2M_SUCCESS)
-    {
-        TFT_Print(TEXT_X, TEXT_Y + 10, "Wi-Fi Init Error!", TFT_RED, TFT_BLACK, 1);
-        while(1); // Tu zostawiamy while tylko dla b??du krytycznego sprz?tu
-    }
-
-    /* Wi-Fi connection */
-    sprintf(status_buffer, "Connecting to: %s", WLAN_SSID);
-    TFT_Print(TEXT_X, TEXT_Y + 10, status_buffer, TFT_WHITE, TFT_BLACK, 1);
-
-    ret = m2m_wifi_connect((char *)WLAN_SSID,
-                           strlen(WLAN_SSID),
-                           WLAN_AUTH,
-                           (void *)WLAN_PSK,
-                           M2M_WIFI_CH_ALL);
-    if (ret != M2M_SUCCESS)
-    {
-        TFT_Print(TEXT_X, TEXT_Y + 20, "Conn. Error!", TFT_RED, TFT_BLACK, 1);
+    if (ret != M2M_SUCCESS) {
+        while(1); 
     }
 }
 
-/**
- * To funkcja, któr? musisz wywo?ywa? w p?tli while(1) w main()
- */
 void wifi_task(void)
 {
-    // Obs?uga zdarze? Wi-Fi (nieblokuj?ca)
     m2m_wifi_handle_events(NULL);
 }
 
-/**
- * Callback Wi-Fi
- */
 void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
 {
     switch(u8WiFiEvent)
@@ -78,14 +147,16 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
             tstrM2mWifiStateChanged *pState = (tstrM2mWifiStateChanged *)pvMsg;
             if (pState->u8CurrState == M2M_WIFI_CONNECTED)
             {
-                TFT_Print(TEXT_X, TEXT_Y + 20, "Wi-Fi Connected! Wait DHCP...", TFT_GREEN, TFT_BLACK, 1);
+                // Po??czenie nawi?zane (Layer 2), czekamy na IP
+                TFT_Print(TEXT_X, TEXT_Y + 15, "Polaczono! Pobieranie IP...", TFT_GREEN, TFT_BLACK, 1);
+                wifi_connect_error = false;
             }
             else if (pState->u8CurrState == M2M_WIFI_DISCONNECTED)
             {
-                TFT_Print(TEXT_X, TEXT_Y + 20, "Disconnected! Reconnecting...", TFT_RED, TFT_BLACK, 1);
+                // To wywo?a si?, je?li wpisano z?e has?o lub sie? znikn??a podczas próby
+                TFT_Print(TEXT_X, TEXT_Y + 15, "Blad: Nie znaleziono!", TFT_RED, TFT_BLACK, 1);
                 wifi_connected = false;
-                m2m_wifi_connect((char *)WLAN_SSID, strlen(WLAN_SSID),
-                                 WLAN_AUTH, (void *)WLAN_PSK, M2M_WIFI_CH_ALL);
+                wifi_connect_error = true; 
             }
             break;
         }
@@ -95,9 +166,9 @@ void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg)
             uint8_t *ipAddr = (uint8_t *)pvMsg;
             wifi_connected = true;
             
-            // Wy?wietlenie IP na ekranie
             sprintf(status_buffer, "IP: %u.%u.%u.%u", 
                     ipAddr[0], ipAddr[1], ipAddr[2], ipAddr[3]);
+            // Wy?wietlamy IP w 3 linii (pod statusem)
             TFT_Print(TEXT_X, TEXT_Y + 30, status_buffer, TFT_YELLOW, TFT_BLACK, 1);
             
             LED_BLUE_SetLow();

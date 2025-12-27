@@ -1,16 +1,20 @@
-#ifndef WIFI_CONNECTION_H_INCLUDED
-#define WIFI_CONNECTION_H_INCLUDED
+#ifndef WIFI_CONNECTION_H
+#define WIFI_CONNECTION_H
 
 #include <stdbool.h>
 #include <stdint.h>
 
+// Flagi statusu
 extern bool wifi_connected;
+extern bool wifi_connect_error; // <--- NOWA FLAGA B??DU
 
-// Rozdzielamy inicjalizacj? od zadania cyklicznego
 void wifi_setup(void);
 void wifi_task(void);
-
-// Callback pozostaje dost?pny
 void wifi_event_cb(uint8_t u8WiFiEvent, const void *const pvMsg);
 
-#endif /* WIFI_CONNECTION_H_INCLUDED */
+void Draw_Wifi_Menu(void);
+int Check_Wifi_Touch(uint16_t ty);
+void Wifi_Connect_Selection(int index);
+void Wifi_Highlight_Button(int index, uint16_t color);
+
+#endif

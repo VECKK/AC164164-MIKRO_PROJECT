@@ -13,8 +13,6 @@
 #endif
 #include <libpic30.h>
 
-// Do??czamy czcionk?. 
-// Zak?adamy, ?e glcdfont.c zawiera tablic?: const unsigned char font[] = { ... };
 #include "glcdfont.c" 
 
 // --- Funkcje pomocnicze SPI ---
@@ -70,7 +68,7 @@ void TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
     TFT_WriteData(y1 >> 8);
     TFT_WriteData(y1 & 0xFF);
 
-    TFT_WriteCommand(0x2C); // Zapis do pami?ci
+    TFT_WriteCommand(0x2C); // Zapis do pamieci
 }
 
 // --- Funkcje Rysowania ---
@@ -130,7 +128,7 @@ void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, u
                     TFT_DrawPixel(x + i, y + j, color);
                 else
                     TFT_FillRect(x + (i * size), y + (j * size), size, size, color);
-            } else if (bg != color) { // Rysuj t?o tylko je?li jest inne ni? kolor tekstu
+            } else if (bg != color) { // Rysuj tlo tylko jesli jest inne nie kolor tekstu
                 if (size == 1)
                     TFT_DrawPixel(x + i, y + j, bg);
                 else
@@ -140,17 +138,34 @@ void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, u
     }
 }
 
-// Rysuje ca?y ci?g znaków (string)
+// Rysuje caly ciag znaków (string)
 void TFT_Print(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, uint8_t size) {
     while (*str) {
-        // Przej?cie do nowej linii, je?li wyjdziemy poza ekran
+        // Przejscie do nowej linii, jesli wyjdziemy poza ekran
         if (x + (size * 6) >= TFT_WIDTH) {
             x = 0;
             y += size * 8;
         }
         
         TFT_DrawChar(x, y, *str, color, bg, size);
-        x += size * 6; // Przesu? kursor (5 pikseli znak + 1 odst?p)
+        x += size * 6; // Przesun kursor (5 pikseli znak + 1 odst?p)
         str++;
     }
+}
+
+// Rysuje pusty prostok?t (obrys)
+void TFT_DrawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
+    // Rysowanie 4 linii za pomoc? FillRect
+    
+    // Górna kraw?d?
+    TFT_FillRect(x, y, w, 1, color);
+    
+    // Dolna kraw?d?
+    TFT_FillRect(x, y + h - 1, w, 1, color);
+    
+    // Lewa kraw?d?
+    TFT_FillRect(x, y, 1, h, color);
+    
+    // Prawa kraw?d?
+    TFT_FillRect(x + w - 1, y, 1, h, color);
 }

@@ -33,19 +33,19 @@ static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP);
  */
 void weather_client_init(void)
 {
-    // Opcjonalnie wyczy?? obszar statusu pogody
+    // Opcjonalnie wyczysc obszar statusu pogody
 }
 
 void weather_client_task(void)
 {
-    // Uruchamiamy pobieranie tylko gdy jest Wi-Fi i nie jeste?my w trakcie po??czenia
+    // Uruchamiamy pobieranie tylko gdy jest Wi-Fi i nie jestesmy w trakcie polaczenia
     if (wifi_connected && !connection_ready && tcp_client_socket == -1)
     {
         registerSocketCallback(socket_cb, resolve_cb);
         gethostbyname((const char *)WEATHER_SERVER_NAME);
         
-        // Ustawiamy flag?, ?eby nie wywo?ywa? DNS w kó?ko
-        connection_ready = true; // Tymczasowo blokujemy ponowne wej?cie
+        // Ustawiamy flage, zeby nie wywolywal DNS w kólko
+        connection_ready = true; // Tymczasowo blokujemy ponowne wejscie
     }
 }
 
@@ -94,7 +94,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
             if (pstrConnect && pstrConnect->s8Error == SOCK_ERR_NO_ERROR)
             {
                 
-                // Zmiana: Pe?niejszy nag?ówek HTTP
+                // Pelny naglówek HTTP
                 memset(http_request, 0, BUFFER_SIZE);
                 snprintf(http_request, BUFFER_SIZE,
                         "GET /data/2.5/weather?q=%s&appid=%s&units=metric HTTP/1.1\r\n"
@@ -117,7 +117,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
         case SOCKET_MSG_SEND:
         {
             
-            // Mówimy modu?owi: "Jestem gotowy na dane, wrzu? je do recv_buffer"
+            // Mówimy modulowi: "Jestem gotowy na dane, wrzuc je do recv_buffer"
             recv(tcp_client_socket, recv_buffer, sizeof(recv_buffer), 0);
         }
         break;
@@ -134,13 +134,13 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                 char *pcEndPtr;
                 char *tmpPtr;
                 
-                // Bufory na wyniki (zainicjalizowane jako N/A na wypadek b??du)
+                // Bufory na wyniki (zainicjalizowane jako N/A na wypadek bledu)
                 char city[32] = "N/A";
                 char temp[16] = "N/A";
                 char cond[32] = "N/A";
 
                 // --- 1. OMIJANIE NAG?ÓWKÓW HTTP ---
-                // Szukamy podwójnego znaku nowej linii, który oddziela nag?ówki od tre?ci (JSON)
+                // Szukamy podwójnego znaku nowej linii, który oddziela naglówki od tresci (JSON)
                 pcIndxPtr = strstr((char*)pstrRecv->pu8Buffer, "\r\n\r\n");
                 
                 if (pcIndxPtr) 
@@ -149,7 +149,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                 }
                 else 
                 {
-                    // Je?li nie znaleziono nag?ówków, zak?adamy, ?e ca?y bufor to dane
+                    // Jesli nie znaleziono naglówków, zakladamy, ze caly bufor to dane
                     pcIndxPtr = (char*)pstrRecv->pu8Buffer; 
                 }
 
@@ -161,10 +161,10 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                     if (tmpPtr) 
                     {
                         tmpPtr++; // Przeskakujemy dwukropek
-                        if(*tmpPtr == '\"') tmpPtr++; // Przeskakujemy cudzys?ów otwieraj?cy
+                        if(*tmpPtr == '\"') tmpPtr++; // Przeskakujemy cudzys'ów otwierajacy
                         
-                        pcEndPtr = strchr(tmpPtr, '\"'); // Szukamy cudzys?owu zamykaj?cego
-                        if(pcEndPtr) *pcEndPtr = 0; // Wstawiamy NULL (uci?cie stringa) w miejscu ko?cowego cudzys?owu
+                        pcEndPtr = strchr(tmpPtr, '\"'); // Szukamy cudzyslowu zamykajacego
+                        if(pcEndPtr) *pcEndPtr = 0; // Wstawiamy NULL (uci?cie stringa) w miejscu koncowego cudzys?owu
                         
                         strncpy(city, tmpPtr, sizeof(city)-1); // Kopiujemy wynik
                     }
@@ -178,7 +178,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                     if(tmpPtr)
                     {
                         tmpPtr++;
-                        // Temperatura to liczba, ko?czy si? przecinkiem lub klamr? zamykaj?c?
+                        // Temperatura to liczba, konczy sie przecinkiem lub klamra zamykajac?
                         pcEndPtr = strpbrk(tmpPtr, ",}"); 
                         if(pcEndPtr) *pcEndPtr = 0;
                         strncpy(temp, tmpPtr, sizeof(temp)-1);
@@ -186,7 +186,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                 }
 
                 // --- 4. PARSOWANIE WARUNKÓW ("weather" -> "main") ---
-                // "weather" jest tablic? obiektów, wi?c szukamy najpierw "weather", a potem "main" wewn?trz
+                // "weather" jest tablica obiektów, wiec szukamy najpierw "weather", a potem "main" wewnatrz
                 tmpPtr = strstr(pcIndxPtr, "\"weather\"");
                 if(tmpPtr)
                 {
@@ -206,29 +206,29 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                 }
 
                 // --- 5. WY?WIETLANIE NA EKRANIE (3 LINIE) ---
-                // Upewnij si?, ?e display_buffer jest zadeklarowany w pliku (np. static char display_buffer[64];)
+                // Upewnij sie, ze display_buffer jest zadeklarowany w pliku (np. static char display_buffer[64];)
                 
-                // Linia 1: Miasto (?ó?ty)
+                // Linia 1: Miasto 
                 sprintf(display_buffer, "M: %s", city);
                 TFT_Print(10, 100, display_buffer, TFT_YELLOW, TFT_BLACK, 2);
 
-                // Linia 2: Temperatura (Bia?y)
+                // Linia 2: Temperatura 
                 sprintf(display_buffer, "T: %s C", temp);
                 TFT_Print(10, 140, display_buffer, TFT_WHITE, TFT_BLACK, 2);
 
-                // Linia 3: Warunki (Cyjan)
+                // Linia 3: Warunki 
                 sprintf(display_buffer, "W: %s", cond);
                 TFT_Print(10, 180, display_buffer, TFT_CYAN, TFT_BLACK, 2);
 
-                // --- 6. ZAMKNI?CIE PO??CZENIA ---
-                // Wa?ne: Zwalniamy gniazdo po odebraniu danych
+                // --- 6. ZAMKNIECIE POLACZENIA ---
+                // Wazne: Zwalniamy gniazdo po odebraniu danych
                 close(tcp_client_socket);
                 tcp_client_socket = -1;
                 connection_ready = false; 
             }
             else
             {
-                // Obs?uga przypadku, gdy serwer zamkn?? po??czenie (EOF) lub b??d
+                // Obsluga przypadku, gdy serwer zamknal polaczenie (EOF) lub blad
                 printf("Remote close\r\n");
                 close(tcp_client_socket);
                 tcp_client_socket = -1;

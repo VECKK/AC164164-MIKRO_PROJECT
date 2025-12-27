@@ -41,17 +41,13 @@ void Draw_Keypad(void) {
         uint16_t y = KEY_START_Y + row * (KEY_H + KEY_GAP);
         
         // --- DOBÓR KOLORÓW Z POPRAWK? DLA EKRANU BGR ---
-        // Je?li ekran zamienia R z B, musimy wysy?a? odwrotnie:
         uint16_t color;
         if (i == 9) {
-            // Przycisk "C" ma by? CZERWONY -> wysy?amy BLUE
-            color = TFT_BLUE; 
+            color = TFT_RED; 
         } else if (i == 11) {
-            // Przycisk "OK" -> ZIELONY
             color = TFT_GREEN; 
         } else {
-            // Cyfry maj? by? NIEBIESKIE -> wysy?amy RED
-            color = TFT_RED; 
+            color = TFT_BLUE; 
         }
 
         TFT_FillRect(x, y, KEY_W, KEY_H, color);
@@ -85,11 +81,11 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
             TFT_FillRect(bx, by, KEY_W, KEY_H, TFT_WHITE);
             __delay_ms(100);
             
-            // --- Przywracanie koloru (z poprawk? BGR) ---
+            // --- Przywracanie koloru  ---
             uint16_t color;
-            if (i == 9) color = TFT_BLUE;      // Czerwony (jako Blue)
+            if (i == 9) color = TFT_RED;      
             else if (i == 11) color = TFT_GREEN; 
-            else color = TFT_RED;              // Niebieski (jako Red)
+            else color = TFT_BLUE;            
             
             TFT_FillRect(bx, by, KEY_W, KEY_H, color);
             char label[3] = {key == 'K' ? 'O' : key, key == 'K' ? 'K' : 0, 0};
@@ -115,11 +111,10 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
                     loginSuccess = true; // Zwracamy sukces!
                 } else {
                     // --- PIN B??DNY ---
-                    TFT_FillRect(100, 45, 120, 20, TFT_BLACK); 
-                    // Komunikat na czerwono (wysy?amy BLUE)
-                    TFT_Print(100, 45, "BLEDNY KOD!", TFT_BLUE, TFT_BLACK, 1);
+                    TFT_FillRect(38, 210, 136, 20, TFT_YELLOW); 
+                    TFT_Print(42, 214, "BLEDNY KOD!", TFT_RED, TFT_YELLOW, 2);
                     __delay_ms(1000);
-                    TFT_FillRect(100, 45, 120, 20, TFT_BLACK); // Wyczy?? komunikat
+                    TFT_FillRect(38, 210, 136, 20, TFT_BLACK); // Wyczysc komunikat
                     
                     pinBuffer[0] = 0; 
                 }
@@ -131,7 +126,7 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
             if(!loginSuccess) Update_Pin_Display();
             while(Touch_IsPressed()); // Debouncing
             
-            return loginSuccess; // Wyjd? z funkcji po obs?u?eniu klikni?cia
+            return loginSuccess; 
         }
     }
     return false;
