@@ -54,7 +54,7 @@ void TFT_Init(void) {
     
     // Ustawienie orientacji (opcjonalne)
     TFT_WriteCommand(0x36); // Memory Access Control
-    TFT_WriteData(0x60);   // 
+    TFT_WriteData(0x20);   // 
 }
 
 void TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {

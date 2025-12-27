@@ -66,29 +66,40 @@ void Test_Touch_Init(){
     TFT_Print(150, 100, "Touch Test", TFT_WHITE, TFT_BLACK, 2);
 }
 
-void Test_Touch(char buffer[], uint16_t touchX, uint16_t touchY){
-    if (Touch_IsPressed())
-        {
-            if (Touch_GetCoordinates(&touchX, &touchY))
-            {
-                TFT_FillRect(touchX, touchY, 2, 2, TFT_YELLOW);
-            }
-            
-            TFT_Print(196, 190, "Pressed   ", TFT_GREEN, TFT_BLACK, 1);
-        }
-        else
-        {
-            TFT_Print(196, 190, "NotPressed", TFT_RED, TFT_BLACK, 1);
-        }
-        
-        sprintf(buffer, "%d   ", touchX); 
-        TFT_Print(200, 130, buffer, TFT_WHITE, TFT_BLACK, 2);
+void Test_Touch(void) {
+    uint16_t x = 0, y = 0; // Lokalne zmienne na wspó?rz?dne
+    char buffer[32];       // Lokalny bufor na tekst
 
-        sprintf(buffer, "%d   ", touchY);
-        TFT_Print(200, 160, buffer, TFT_WHITE, TFT_BLACK, 2);
+    // Sprawdzamy czy fizycznie jest nacisk
+    if (Touch_IsPressed()) {
+        
+        // Próbujemy odczyta? i przeliczy? wspó?rz?dne
+        if (Touch_GetCoordinates(&x, &y)) {
+            
+            // 1. RYSOWANIE PUNKTU
+            // Rysujemy kwadrat 3x3 w miejscu dotyku (kolor ?ó?ty)
+            // Odejmujemy 1 od x i y, aby ?rodek kwadratu by? dok?adnie pod palcem
+            TFT_FillRect(x - 1, y - 1, 3, 3, TFT_YELLOW);
+
+            // 2. WY?WIETLANIE STATUSU I WSPÓ?RZ?DNYCH
+            TFT_Print(196, 190, "Pressed   ", TFT_GREEN, TFT_BLACK, 1);
+
+            sprintf(buffer, "%d   ", x); // Spacje na ko?cu czyszcz? poprzednie cyfry
+            TFT_Print(200, 130, buffer, TFT_WHITE, TFT_BLACK, 2);
+
+            sprintf(buffer, "%d   ", y);
+            TFT_Print(200, 160, buffer, TFT_WHITE, TFT_BLACK, 2);
+        }
+    } else {
+        // Je?li brak dotyku
+        TFT_Print(196, 190, "NotPressed", TFT_RED, TFT_BLACK, 1);
+    }
 }
 
 
+/*
+            Main application
+ */
 /*
             Main application
  */
@@ -96,23 +107,23 @@ int main(void) {
     SYSTEM_Initialize();
     TFT_Init();
     Touch_Init();
-    //==Variables_Initialize==//
-    uint16_t touchX = 0, touchY = 0;
-    char buffer[32]; 
-    //========================//
+
     //==Background_Initialize==//
     TFT_FillScreen(TFT_BLACK);
     Test_Touch_Init();
+    
     wifi_setup();
     weather_client_init();
     //========================//
     
     while (1) {
-        Test_Touch(buffer, touchX, touchY);
+        Test_Touch();
         
         wifi_task();
         weather_client_task();
-        __delay_ms(1000);
+        
+
+        __delay_ms(1); 
     }
     return 1;
 }
