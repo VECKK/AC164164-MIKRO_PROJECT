@@ -12,7 +12,6 @@
 #define WEATHER_SERVER_NAME   "api.openweathermap.org"
 #define WEATHER_SERVER_PORT   80
 #define WEATHER_API_KEY       "b2cc6d9d9380482947d40baf1ccb8c54"
-#define CITY_NAME             "Krakow"
 #define BUFFER_SIZE           1024
 
 /* ===================== ZMIENNE GLOBALNE ===================== */
@@ -23,6 +22,7 @@ static bool connection_ready = false;
 static char http_request[BUFFER_SIZE];
 static uint8_t recv_buffer[BUFFER_SIZE];
 static char display_buffer[64]; // Pomocniczy bufor do sprintf
+static char selected_city[32] = "Krakow"; // Domy?lne miasto
 
 /* ===================== PROTOTYPY ===================== */
 static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg);
@@ -36,6 +36,11 @@ void weather_client_init(void)
     // Opcjonalnie wyczysc obszar statusu pogody
 }
 
+void weather_set_city(const char* new_city) {
+    // Kopiujemy nazw? miasta do zmiennej globalnej
+    strncpy(selected_city, new_city, sizeof(selected_city) - 1);
+}
+
 void weather_client_task(void)
 {
     // Uruchamiamy pobieranie tylko gdy jest Wi-Fi i nie jestesmy w trakcie polaczenia
@@ -47,6 +52,16 @@ void weather_client_task(void)
         // Ustawiamy flage, zeby nie wywolywal DNS w kólko
         connection_ready = true; // Tymczasowo blokujemy ponowne wejscie
     }
+}
+
+void weather_client_reset(void) {
+    // Zamykamy socket je?li otwarty i resetujemy flagi
+    if (tcp_client_socket != -1) {
+        close(tcp_client_socket);
+        tcp_client_socket = -1;
+    }
+    connection_ready = false; // To pozwoli funkcji task ponownie wywo?a? DNS
+    server_resolved = false;  // Wymu? ponowne rozwi?zanie nazwy (opcjonalne, ale bezpieczne)
 }
 
 /**
@@ -102,7 +117,7 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                         "User-Agent: PIC32Client\r\n"
                         "Connection: close\r\n"
                         "Accept: */*\r\n\r\n",
-                        CITY_NAME, WEATHER_API_KEY, WEATHER_SERVER_NAME);
+                        selected_city, WEATHER_API_KEY, WEATHER_SERVER_NAME);
                 
                 send(tcp_client_socket, http_request, strlen(http_request), 0);
             }

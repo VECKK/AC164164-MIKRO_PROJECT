@@ -6,6 +6,7 @@
 #include "ILI9341_files/tft_gfx.h"
 #include "ILI9341_files/touch_sensor.h"
 #include "ILI9341_files/keypad.h"
+#include "mcc_generated_files/examples/city_menu.h"
 
 #define FCY 16000000UL 
 #include <libpic30.h>
@@ -14,8 +15,9 @@
 typedef enum {
     STATE_WIFI_SELECT,
     STATE_CONNECTING,
-    STATE_LOGIN,       
-    STATE_WEATHER    
+    STATE_LOGIN,
+    STATE_CITY_SELECT,
+    STATE_WEATHER
 } AppState;
 
 AppState currentState = STATE_WIFI_SELECT;
@@ -103,14 +105,48 @@ int main(void) {
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
                 if (Handle_Login_Touch(x, y)) {
-                    currentState = STATE_WEATHER;
+                    Draw_City_Menu(); 
+                    currentState = STATE_CITY_SELECT;
+                    __delay_ms(500);
                 }
                 break;
 
+            // --- 6. CITY ---
+            case STATE_CITY_SELECT:
+                if (!Touch_IsPressed()) break;
+                if (!Touch_GetCoordinates(&x, &y)) break;
 
-            // --- 4. POGODA ---
+                int cityIndex = Check_City_Touch(y);
+                if (cityIndex != -1) {
+                    weather_set_city(polish_cities[cityIndex]);
+                    
+                    weather_client_reset(); 
+                    
+                    TFT_FillScreen(TFT_BLACK);
+                    Draw_Return_Button(); // Narysuj przycisk powrotu na dole
+                    
+                    currentState = STATE_WEATHER;
+                    __delay_ms(500);
+                }
+                break;
+
+            // --- 5. POGODA ---
             case STATE_WEATHER:
                 weather_client_task();
+                
+                // Obs?uga przycisku RETURN
+                if (Touch_IsPressed()) {
+                     if (Touch_GetCoordinates(&x, &y)) {
+                        if (y > 260) { 
+                            weather_client_reset(); 
+                            
+                            // Wracamy do menu
+                            Draw_City_Menu();
+                            currentState = STATE_CITY_SELECT;
+                            __delay_ms(500);
+                        }
+                    }
+                }
                 break;
         }
         

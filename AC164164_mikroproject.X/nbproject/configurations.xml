@@ -21,6 +21,7 @@
         <logicalFolder name="examples" displayName="examples" projectFiles="true">
           <itemPath>mcc_generated_files/examples/wifi_connection.h</itemPath>
           <itemPath>mcc_generated_files/examples/weather_client.h</itemPath>
+          <itemPath>mcc_generated_files/examples/city_menu.h</itemPath>
         </logicalFolder>
         <logicalFolder name="winc" displayName="winc" projectFiles="true">
           <logicalFolder name="common" displayName="common" projectFiles="true">
@@ -106,6 +107,7 @@
         <logicalFolder name="examples" displayName="examples" projectFiles="true">
           <itemPath>mcc_generated_files/examples/wifi_connection.c</itemPath>
           <itemPath>mcc_generated_files/examples/weather_client.c</itemPath>
+          <itemPath>mcc_generated_files/examples/city_menu.c</itemPath>
         </logicalFolder>
         <logicalFolder name="winc" displayName="winc" projectFiles="true">
           <logicalFolder name="driver" displayName="driver" projectFiles="true">

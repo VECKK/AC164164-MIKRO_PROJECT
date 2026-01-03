@@ -26,15 +26,16 @@
  * Revision history: 
  */
 
-// This is a guard condition so that contents of this file are not included
-// more than once.  
-#ifndef WEATHER_CLIENT_H
-#define WEATHER_CLIENT_H
+#ifndef CITY_MENU_H
+#define CITY_MENU_H
 
-void weather_client_init(void);
-void weather_client_task(void);
-void weather_set_city(const char* new_city);
-void weather_client_reset(void); // Resetuje flagi, aby pobra? dane dla nowego miasta
+#include <stdint.h>
 
-#endif	/* WEATHER_CLIENT_H */
+extern const char* polish_cities[5];
 
+// Deklaracje funkcji
+void Draw_City_Menu(void);
+int Check_City_Touch(uint16_t ty);
+void Draw_Return_Button(void);
+
+#endif // CITY_MENU_H
