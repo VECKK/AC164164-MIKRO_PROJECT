@@ -137,7 +137,7 @@ int main(void) {
                 // Obs?uga przycisku RETURN
                 if (Touch_IsPressed()) {
                      if (Touch_GetCoordinates(&x, &y)) {
-                        if (y > 260) { 
+                        if (y > 200) { 
                             weather_client_reset(); 
                             
                             // Wracamy do menu
