@@ -35,7 +35,7 @@ extern const char* polish_cities[5];
 
 // Deklaracje funkcji
 void Draw_City_Menu(void);
-int Check_City_Touch(uint16_t ty);
+int Check_City_Touch(uint16_t tx, uint16_t ty);
 void Draw_Return_Button(void);
 
 #endif // CITY_MENU_H

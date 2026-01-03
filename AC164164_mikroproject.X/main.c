@@ -116,7 +116,7 @@ int main(void) {
                 if (!Touch_IsPressed()) break;
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
-                int cityIndex = Check_City_Touch(y);
+                int cityIndex = Check_City_Touch(x, y);
                 if (cityIndex != -1) {
                     weather_set_city(polish_cities[cityIndex]);
                     
@@ -132,21 +132,20 @@ int main(void) {
 
             // --- 5. POGODA ---
             case STATE_WEATHER:
-                weather_client_task();
-                
                 // Obs?uga przycisku RETURN
-                if (Touch_IsPressed()) {
-                     if (Touch_GetCoordinates(&x, &y)) {
-                        if (y > 200) { 
-                            weather_client_reset(); 
-                            
-                            // Wracamy do menu
-                            Draw_City_Menu();
-                            currentState = STATE_CITY_SELECT;
-                            __delay_ms(500);
-                        }
-                    }
+                if (!Touch_IsPressed()){
+                    weather_client_task();
+                    break;
                 }
+                if (!Touch_GetCoordinates(&x, &y)) break; 
+                if (y > 200 && x > 200) { 
+                    weather_client_reset(); 
+
+                    // Wracamy do menu
+                    Draw_City_Menu();
+                    currentState = STATE_CITY_SELECT;
+                    __delay_ms(500);
+                     }
                 break;
         }
         
