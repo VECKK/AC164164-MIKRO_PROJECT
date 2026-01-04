@@ -23,6 +23,7 @@ static char http_request[BUFFER_SIZE];
 static uint8_t recv_buffer[BUFFER_SIZE];
 static char display_buffer[64]; // Pomocniczy bufor do sprintf
 static char selected_city[32] = "Krakow"; // Domy?lne miasto
+static char last_weather_info[128] = "Brak danych pogodowych.";
 
 /* ===================== PROTOTYPY ===================== */
 static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg);
@@ -62,6 +63,10 @@ void weather_client_reset(void) {
     }
     connection_ready = false; // To pozwoli funkcji task ponownie wywo?a? DNS
     server_resolved = false;  // Wymu? ponowne rozwi?zanie nazwy (opcjonalne, ale bezpieczne)
+}
+
+void weather_get_last_data(char* buffer) {
+    strcpy(buffer, last_weather_info);
 }
 
 /**
@@ -234,7 +239,9 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
                 // Linia 3: Warunki 
                 sprintf(display_buffer, "W: %s", cond);
                 TFT_Print(10, 180, display_buffer, TFT_CYAN, TFT_BLACK, 2);
-
+                
+                sprintf(last_weather_info, "Miasto: %s\nTemp: %s C\nWarunki: %s", city, temp, cond);
+                
                 // --- 6. ZAMKNIECIE POLACZENIA ---
                 // Wazne: Zwalniamy gniazdo po odebraniu danych
                 close(tcp_client_socket);

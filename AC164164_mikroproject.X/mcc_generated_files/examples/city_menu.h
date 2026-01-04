@@ -30,6 +30,7 @@
 #define CITY_MENU_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 extern const char* polish_cities[5];
 
@@ -37,5 +38,8 @@ extern const char* polish_cities[5];
 void Draw_City_Menu(void);
 int Check_City_Touch(uint16_t tx, uint16_t ty);
 void Draw_Return_Button(void);
+
+void Draw_Send_Button(void);
+bool Check_Send_Touch(uint16_t tx, uint16_t ty);
 
 #endif // CITY_MENU_H

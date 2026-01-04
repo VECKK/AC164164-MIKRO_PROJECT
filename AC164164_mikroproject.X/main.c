@@ -7,8 +7,9 @@
 #include "ILI9341_files/touch_sensor.h"
 #include "ILI9341_files/keypad.h"
 #include "mcc_generated_files/examples/city_menu.h"
+#include "mcc_generated_files/examples/email_client.h"
 
-#define FCY 16000000UL 
+#define FCY 16000000UL
 #include <libpic30.h>
 
 // --- STANY APLIKACJI ---
@@ -38,6 +39,7 @@ int main(void) {
 
     while (1) {
         wifi_task();
+        email_client_task();
         
         switch (currentState) {
             
@@ -111,7 +113,7 @@ int main(void) {
                 }
                 break;
 
-            // --- 6. CITY ---
+            // --- 4. CITY ---
             case STATE_CITY_SELECT:
                 if (!Touch_IsPressed()) break;
                 if (!Touch_GetCoordinates(&x, &y)) break;
@@ -124,6 +126,7 @@ int main(void) {
                     
                     TFT_FillScreen(TFT_BLACK);
                     Draw_Return_Button(); // Narysuj przycisk powrotu na dole
+                    Draw_Send_Button();
                     
                     currentState = STATE_WEATHER;
                     __delay_ms(500);
@@ -145,7 +148,30 @@ int main(void) {
                     Draw_City_Menu();
                     currentState = STATE_CITY_SELECT;
                     __delay_ms(500);
-                     }
+                } else if (Check_Send_Touch(x, y)) {
+                    // Animacja klikni?cia (rysowanie bia?ego prostok?ta)
+                    TFT_FillRect(200, 150, 110, 39, TFT_WHITE);
+                    __delay_ms(100);
+                    Draw_Send_Button(); // Przywró? zielony kolor
+
+                    // 1. Pobierz e-mail u?ytkownika
+                    char* target = get_user_email();
+
+                    // 2. Sprawd? czy e-mail zosta? ustawiony (czy by?o logowanie)
+                    if (strlen(target) > 0) {
+                        // Pobierz dane pogodowe
+                        char weather_data[128];
+                        weather_get_last_data(weather_data);
+
+                        // Rozpocznij wysy?anie
+                        email_send_start(target, "Raport Pogodowy", weather_data);
+                    } else {
+                        // B??d - brak e-maila (u?ytkownik pomin?? logowanie?)
+                        TFT_Print(10, 260, "Blad: Brak Email!", TFT_RED, TFT_BLACK, 1);
+                    }
+
+                    __delay_ms(1000); // Debounce - zapobiega wielokrotnemu wys?aniu
+                }
                 break;
         }
         

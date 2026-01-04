@@ -23,8 +23,12 @@
 
 // Dane u?ytkownika
 static char pinBuffer[5] = ""; 
-const char USER_PIN[] = "1234"; 
+const char USER_PIN[] = "1234";
+static char current_email[64] = "";
 
+char* get_user_email(void) {
+    return current_email;
+}
 
 void Draw_Keypad(void) {
     TFT_FillScreen(TFT_BLACK);    
@@ -99,6 +103,8 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
             } 
             else if (key == 'K') { 
                 if (strcmp(pinBuffer, USER_PIN) == 0) {
+                    // --- PRZYPISANIE EMAILA ---
+                    strcpy(current_email, "u3359765482@gmail.com");
                     // --- PIN POPRAWNY ---
                     TFT_FillScreen(TFT_BLACK);
                     TFT_Print(80, 100, "LOGOWANIE...", TFT_GREEN, TFT_BLACK, 2);

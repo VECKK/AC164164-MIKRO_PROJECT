@@ -12,6 +12,10 @@
 #define RETURN_Y        200
 #define RETURN_WIDTH    110
 #define RETURN_HEIGHT   39
+#define SEND_X          200
+#define SEND_Y          150  // 50 pikseli wy?ej ni? Return
+#define SEND_WIDTH      110
+#define SEND_HEIGHT     39
 
 // Definicja tablicy miast
 const char* polish_cities[5] = {"Krakow", "Warszawa", "Wroclaw", "Gdansk", "Zakopane"};
@@ -48,4 +52,17 @@ void Draw_Return_Button(void) {
     // Dane s? na Y=100, 140, 180. Przycisk damy na Y=270
     TFT_DrawRect(RETURN_X, RETURN_Y, RETURN_WIDTH, RETURN_HEIGHT, TFT_RED);
     TFT_Print(RETURN_X + 18, RETURN_Y + 14, "Return", TFT_WHITE, TFT_BLACK, 2);
+}
+
+void Draw_Send_Button(void) {
+    TFT_DrawRect(SEND_X, SEND_Y, SEND_WIDTH, SEND_HEIGHT, TFT_GREEN);
+    TFT_Print(SEND_X + 25, SEND_Y + 14, "Send", TFT_WHITE, TFT_BLACK, 2);
+}
+
+bool Check_Send_Touch(uint16_t tx, uint16_t ty) {
+    if (tx >= SEND_X && tx <= (SEND_X + SEND_WIDTH) &&
+        ty >= SEND_Y && ty <= (SEND_Y + SEND_HEIGHT)) {
+        return true;
+    }
+    return false;
 }

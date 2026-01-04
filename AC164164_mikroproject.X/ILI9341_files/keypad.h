@@ -22,4 +22,6 @@ void Update_Pin_Display(void);
 // Zwraca: true - je?li kod poprawny (zalogowano), false - w przeciwnym razie
 bool Handle_Login_Touch(uint16_t tx, uint16_t ty);
 
+char* get_user_email(void);
+
 #endif	/* KEYPAD_H */

@@ -26,16 +26,19 @@
  * Revision history: 
  */
 
-// This is a guard condition so that contents of this file are not included
-// more than once.  
-#ifndef WEATHER_CLIENT_H
-#define WEATHER_CLIENT_H
+#ifndef EMAIL_CLIENT_H
+#define EMAIL_CLIENT_H
 
-void weather_client_init(void);
-void weather_client_task(void);
-void weather_set_city(const char* new_city);
-void weather_client_reset(void); // Resetuje flagi, aby pobra? dane dla nowego miasta
-void weather_get_last_data(char* buffer);
+#include <stdbool.h>
 
-#endif	/* WEATHER_CLIENT_H */
+void email_client_init(void);
 
+// to_email: adres odbiorcy
+// subject: temat
+// body: tre?? (tutaj wstawimy pogod?)
+void email_send_start(char* to_email, char* subject, char* body);
+void email_client_task(void);
+
+bool email_is_busy(void); // wys?anie trwa?
+
+#endif
