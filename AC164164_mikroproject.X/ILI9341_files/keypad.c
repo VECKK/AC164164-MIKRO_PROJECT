@@ -104,9 +104,7 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
                     TFT_Print(80, 100, "LOGOWANIE...", TFT_GREEN, TFT_BLACK, 2);
                     __delay_ms(1000);
                     
-                    // Czy?cimy ekran pod nast?pny etap
                     TFT_FillScreen(TFT_BLACK); 
-                    TFT_Print(10, 70, "POGODA DLA: KRAKOW", TFT_WHITE, TFT_BLACK, 1);
                     
                     loginSuccess = true; // Zwracamy sukces!
                 } else {

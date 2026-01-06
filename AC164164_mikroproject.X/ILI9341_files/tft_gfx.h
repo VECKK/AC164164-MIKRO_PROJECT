@@ -30,6 +30,10 @@ void TFT_DrawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color
 void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, uint8_t size);
 void TFT_Print(uint16_t x, uint16_t y, char *str, uint16_t color, uint16_t bg, uint8_t size);
 
+//Deklaracje do paska koloru
+uint16_t Color_Wheel(uint8_t pos);
+void TFT_Draw_Rainbow_Bar(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
+
 // Kolory (BGR565) - Skorygowane dla wy?wietlaczy z odwróconym R/B
 #define TFT_BLACK       0x0000
 #define TFT_NAVY        0x7800  

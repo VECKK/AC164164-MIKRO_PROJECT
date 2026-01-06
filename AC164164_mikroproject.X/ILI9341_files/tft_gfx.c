@@ -169,3 +169,26 @@ void TFT_DrawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color
     // Prawa kraw?d?
     TFT_FillRect(x + w - 1, y, 1, h, color);
 }
+
+// Konwersja 0-255 na RGB565
+uint16_t Color_Wheel(uint8_t pos) {
+    pos = 255 - pos;
+    uint8_t r, g, b;
+    if (pos < 85) {
+        r = 255 - pos * 3; g = 0; b = pos * 3;
+    } else if (pos < 170) {
+        pos -= 85; r = 0; g = pos * 3; b = 255 - pos * 3;
+    } else {
+        pos -= 170; r = pos * 3; g = 255 - pos * 3; b = 0;
+    }
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+}
+
+// Rysowanie paska t?czy
+void TFT_Draw_Rainbow_Bar(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+    for (uint16_t i = 0; i < w; i++) {
+        uint8_t hue = (i * 255) / w;
+        TFT_FillRect(x + i, y, 1, h, Color_Wheel(hue));
+    }
+    TFT_DrawRect(x - 1, y - 1, w + 2, h + 2, TFT_WHITE); // Ramka
+}
