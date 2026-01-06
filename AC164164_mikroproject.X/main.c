@@ -9,23 +9,25 @@
 #include "ILI9341_files/keypad.h"
 #include "mcc_generated_files/examples/city_menu.h"
 
-// Usuni?to bibliotek? email_client.h zgodnie z pro?b?
-
 #define FCY 16000000UL
 #include <libpic30.h>
 
-// --- KONFIGURACJA UI POGODY ---
-// Nag?ówek na górze (to on b?dzie zmienia? kolor)
-#define HEADER_X      0
-#define HEADER_Y      0
-#define HEADER_W      240
-#define HEADER_H      30
+// --- STRUKTURA U?YTKOWNIKA ---
+typedef struct {
+    char pin[5];            
+    uint16_t headerColor;   
+    char* startCity;        
+    char name[10];          
+} UserProfile;
 
-// Suwak kolorów na samym dole ekranu
-#define SLIDER_X      10
-#define SLIDER_Y      202
-#define SLIDER_W      180
-#define SLIDER_H      36
+// --- DANE U?YTKOWNIKÓW ---
+UserProfile users[3] = {
+    {"1234", TFT_CYAN,  "Warszawa", "Lukasz"},
+    {"1111", TFT_RED,   "Krakow",   "Kacper"},
+    {"2222", TFT_GREEN, "Wroclaw",  "Wiktoria"}
+};
+
+int currentUserIndex = -1;
 
 // --- STANY APLIKACJI ---
 typedef enum {
@@ -38,19 +40,20 @@ typedef enum {
 
 AppState currentState = STATE_WIFI_SELECT;
 
-// --- FUNKCJA RYSUJ?CA INTERFEJS POGODY ---
-void Draw_Weather_Interface(uint16_t headerColor) {
+// --- FUNKCJA LOGIKI WYLOGOWANIA ---
+void Perform_Logout_Logic(void) {
+    // Animacja graficzna (z city_menu.c)
+    Animate_Logout_Click();
+    __delay_ms(200);
+
+    currentUserIndex = -1;
+    
+    // Zmiana ekranu
     TFT_FillScreen(TFT_BLACK);
+    Draw_Keypad();
+    Update_Pin_Display();
     
-    // 1. Rysujemy nag?ówek w wybranym kolorze
-    TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, headerColor);
-    TFT_Print(10, 8, "POGODA LIVE", TFT_BLACK, headerColor, 2);
-    
-    // 2. Rysujemy przycisk powrotu
-    Draw_Return_Button(); 
-    
-    // 3. Rysujemy suwak kolorów na dole
-    TFT_Draw_Rainbow_Bar(SLIDER_X, SLIDER_Y, SLIDER_W, SLIDER_H);
+    currentState = STATE_LOGIN;
 }
 
 // --- MAIN ---
@@ -68,11 +71,7 @@ int main(void) {
     int selectedNetworkIndex = -1;
     int timeoutCounter = 0; 
     
-    // Zmienne dla ekranu pogody
-    uint16_t userColor = TFT_CYAN;  // Domy?lny kolor nag?ówka
-    bool weatherScreenInit = false; // Flaga, ?eby narysowa? interfejs tylko raz
-    
-    // Zmienna do usuwania starego paska na suwaku (-1 oznacza brak paska)
+    bool weatherScreenInit = false; 
     int last_slider_x = -1; 
 
     while (1) {
@@ -92,14 +91,12 @@ int main(void) {
                 Wifi_Connect_Selection(selectedNetworkIndex);         
                 timeoutCounter = 0;                                   
                 currentState = STATE_CONNECTING;
-                
                 __delay_ms(500); 
                 break;
 
 
-            // --- 2. OCZEKIWANIE ---
+            // --- 2. OCZEKIWANIE NA WIFI ---
             case STATE_CONNECTING:
-                // A. Sukces
                 if (wifi_connected) {
                     TFT_FillScreen(TFT_BLACK);
                     Draw_Keypad();
@@ -108,7 +105,6 @@ int main(void) {
                     break; 
                 }
                 
-                // B. B??d modu?u
                 if (wifi_connect_error) {
                     TFT_Print(20, 260, "BLAD! Sprobuj ponownie.", TFT_RED, TFT_BLACK, 1);
                     __delay_ms(2000);
@@ -117,7 +113,6 @@ int main(void) {
                     break;
                 }
 
-                // C. Timeout
                 timeoutCounter++;
                 if (timeoutCounter > 1000) { 
                     TFT_Print(20, 260, "TIMEOUT! Brak sieci.", TFT_RED, TFT_BLACK, 1);
@@ -127,7 +122,6 @@ int main(void) {
                     break;
                 }
                 
-                // D. Anulowanie
                 if (Touch_IsPressed()) {
                     TFT_Print(20, 260, "Anulowano.", TFT_YELLOW, TFT_BLACK, 1);
                     m2m_wifi_disconnect(); 
@@ -138,14 +132,22 @@ int main(void) {
                 break;
 
 
-            // --- 3. LOGIN ---
+            // --- 3. LOGOWANIE PINEM ---
             case STATE_LOGIN:
                 if (!Touch_IsPressed()) break;  
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
-                if (Handle_Login_Touch(x, y)) {
-                    Draw_City_Menu(); 
-                    currentState = STATE_CITY_SELECT;
+                int loggedID = Handle_Login_Touch(users[0].pin, users[1].pin, users[2].pin, x, y);
+                
+                if (loggedID != -1) {
+                    currentUserIndex = loggedID;
+                    weather_set_city(users[currentUserIndex].startCity);
+                    weather_client_reset();
+                    
+                    weatherScreenInit = false; 
+                    last_slider_x = -1;
+                    
+                    currentState = STATE_WEATHER;
                     __delay_ms(500);
                 }
                 break;
@@ -155,75 +157,81 @@ int main(void) {
                 if (!Touch_IsPressed()) break;
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
+                // A. Wybór miasta
                 int cityIndex = Check_City_Touch(x, y);
                 if (cityIndex != -1) {
                     weather_set_city(polish_cities[cityIndex]);
-                    
                     weather_client_reset(); 
                     
-                    // Przechodzimy do pogody - resetujemy flagi
                     weatherScreenInit = false; 
-                    last_slider_x = -1; // Reset pozycji suwaka
-                    
+                    last_slider_x = -1;
                     currentState = STATE_WEATHER;
+                    __delay_ms(500);
+                }
+                // B. LOGOUT (Prawy Górny Róg)
+                else if (Check_Logout_Touch(x, y)) {
+                    Perform_Logout_Logic();
                     __delay_ms(500);
                 }
                 break;
 
-            // --- 5. POGODA + SUWAK KOLORU ---
+            // --- 5. POGODA (G?ówny ekran) ---
             case STATE_WEATHER:
-                // A. Rysowanie interfejsu (tylko raz po wej?ciu)
                 if (!weatherScreenInit) {
-                    Draw_Weather_Interface(userColor);
+                    Draw_Weather_Interface(users[currentUserIndex].headerColor, users[currentUserIndex].name);
                     weatherScreenInit = true;
                 }
             
-                // B. Aktualizacja danych tekstowych w tle
                 if (!Touch_IsPressed()) {
                     weather_client_task();
                     break; 
                 }
 
-                // C. Obs?uga dotyku
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
-                // 1. SPRAWDZENIE SUWAKA (Zmiana koloru)
+                // 1. ZMIANA KOLORU (Suwak - definicje z city_menu.h)
                 if (x >= SLIDER_X && x <= (SLIDER_X + SLIDER_W) &&
                     y >= SLIDER_Y && y <= (SLIDER_Y + SLIDER_H)) 
-                {                 
+                {
                     if (last_slider_x != -1) {
-                        // Obliczamy kolor, jaki by? w tym miejscu oryginalnie
                         uint16_t old_rel_x = last_slider_x - SLIDER_X;
                         uint8_t old_hue = (old_rel_x * 255) / SLIDER_W;
-                        uint16_t old_bg_color = Color_Wheel(old_hue);
-                        
-                        // Zamalowujemy stary bia?y pasek oryginalnym kolorem t?czy
-                        TFT_FillRect(last_slider_x, SLIDER_Y, 2, SLIDER_H, old_bg_color);
+                        TFT_FillRect(last_slider_x, SLIDER_Y, 2, SLIDER_H, Color_Wheel(old_hue));
                     }
 
-                    // Krok 2: Obliczenie nowego koloru
                     uint16_t rel_x = x - SLIDER_X;
                     uint8_t hue = (rel_x * 255) / SLIDER_W;
-                    userColor = Color_Wheel(hue);
+                    uint16_t newColor = Color_Wheel(hue);
                     
-                    // Krok 3: Rysowanie nowego bia?ego paska (wska?nika)
-                    TFT_FillRect(x, SLIDER_Y, 2, SLIDER_H, TFT_WHITE);
-                    last_slider_x = x; // Zapami?tujemy pozycj?
+                    users[currentUserIndex].headerColor = newColor;
 
-                    // Krok 4: Aktualizacja nag?ówka
-                    TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, userColor);
-                    TFT_Print(10, 8, "POGODA LIVE", TFT_BLACK, userColor, 2);
+                    TFT_FillRect(x, SLIDER_Y, 2, SLIDER_H, TFT_WHITE);
+                    last_slider_x = x; 
+
+                    TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, newColor);
+                    char headerText[30];
+                    sprintf(headerText, "POGODA - %s", users[currentUserIndex].name);
+                    TFT_Print(5, 8, headerText, TFT_BLACK, newColor, 2);
                 }
                 
-                // 2. PRZYCISK "POWRÓT" (EXIT)
-                // Sprawdzamy, czy Y > 200, ale te? czy nie jeste?my na suwaku
-                else if (x > 200 && y > 200 && y < SLIDER_Y) { 
-                    weather_client_reset(); 
-
-                    Draw_City_Menu();
-                    currentState = STATE_CITY_SELECT;
-                    __delay_ms(500);
+                // 2. PRZYCISK LOGOUT (Prawy Górny Róg)
+                else if (Check_Logout_Touch(x, y)) {
+                     weather_client_reset(); // Stop pobierania danych
+                     Perform_Logout_Logic();
+                     break; // Wyj?cie, aby nie rysowa? dalej
                 }
+
+                // 3. PRZYCISK RETURN (Prawy Dolny Róg)
+                else if (x > 200 && y > 200) { 
+                    TFT_DrawRect(BUTTON_X, RETURN_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
+                    weather_client_reset(); 
+                    Draw_City_Menu(); 
+                    currentState = STATE_CITY_SELECT;
+                    break; // Wyj?cie
+                }
+                
+                // Aktualizacja w tle (tylko gdy nie ma akcji wyj?cia)
+                weather_client_task();
                 
                 break;
         }

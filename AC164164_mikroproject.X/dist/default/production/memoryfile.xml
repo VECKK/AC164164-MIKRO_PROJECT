@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project>
-  <executable name="dist/default/debug/AC164164_mikroproject.X.debug.elf">
+  <executable name="dist/default/production/AC164164_mikroproject.X.production.elf">
     <memory name="data">
       <units>bytes</units>
       <length>16384</length>
-      <used>2808</used>
-      <free>13576</free>
+      <used>2730</used>
+      <free>13654</free>
     </memory>
     <memory name="program">
       <units>bytes</units>
       <length>134400</length>
-      <used>48852</used>
-      <free>85548</free>
+      <used>48855</used>
+      <free>85545</free>
     </memory>
   </executable>
 </project>
