@@ -11,6 +11,7 @@
             <sourceRootList>
                 <sourceRootElem>mcc_generated_files/examples</sourceRootElem>
                 <sourceRootElem>ILI9341_files</sourceRootElem>
+                <sourceRootElem>Bulb</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

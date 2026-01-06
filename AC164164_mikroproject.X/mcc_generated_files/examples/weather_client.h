@@ -33,6 +33,9 @@
 
 void weather_client_init(void);
 void weather_client_task(void);
+void weather_set_city(const char* new_city);
+void weather_client_reset(void); // Resetuje flagi, aby pobra? dane dla nowego miasta
+void weather_get_last_data(char* buffer);
 
 #endif	/* WEATHER_CLIENT_H */
 

@@ -1,0 +1,5 @@
+<<<<<<<< HEAD:AC164164_mikroproject.X/.generated_files/flags/default/bcc0a3c020da329e05582c4f5134b3011f026393
+ -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -DXPRJ_default=$(CND_CONF)    -I"mcc_generated_files/config" -I"mcc_generated_files/winc" -I"mcc_generated_files/drivers" -Wa,-g,--no-relax$(MP_EXTRA_AS_POST)  -mdfp="${DFP_DIR}/xc16"C:\Users\wikto\PROJEKT_MIKRO\AC164164-MIKRO_PROJECT\AC164164_mikroproject.X\mcc_generated_files\where_was_i.s
+========
+ -c -mcpu=$(MP_PROCESSOR_OPTION)  -omf=elf -DXPRJ_default=$(CND_CONF)    -I"mcc_generated_files/config" -I"mcc_generated_files/winc" -I"mcc_generated_files/drivers" -Wa,-g,--no-relax$(MP_EXTRA_AS_POST)  -mdfp="${DFP_DIR}/xc16"C:\Users\gasec\Desktop\Studia_AGH_22-27\V_SEM\Aplikacje_Mikrokontrolerow\AC164164-MIKRO_PROJECT\AC164164_mikroproject.X\mcc_generated_files\where_was_i.s
+>>>>>>>> Select_city:AC164164_mikroproject.X/.generated_files/flags/default/3edf865faa9f9c6e859d4595898768ac7857e167
