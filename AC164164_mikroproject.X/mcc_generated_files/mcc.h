@@ -51,12 +51,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "spi2.h"
+#include "delay.h"
+#include "spi1_driver.h"
+#include "drivers/spi_master.h"
 #include "interrupt_manager.h"
 #include "traps.h"
-#include "drivers/spi_master.h"
-#include "spi1_driver.h"
-#include "delay.h"
+#include "i2c1_driver.h"
+#include "spi2.h"
 
 #warning "This file will be removed in future MCC releases. Use system.h instead."
 

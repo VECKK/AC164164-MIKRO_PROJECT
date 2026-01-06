@@ -9,9 +9,10 @@
             <sourceEncoding>ISO-8859-1</sourceEncoding>
             <make-dep-projects/>
             <sourceRootList>
-                <sourceRootElem>mcc_generated_files/examples</sourceRootElem>
                 <sourceRootElem>ILI9341_files</sourceRootElem>
                 <sourceRootElem>Bulb</sourceRootElem>
+                <sourceRootElem>RFID</sourceRootElem>
+                <sourceRootElem>mcc_generated_files</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

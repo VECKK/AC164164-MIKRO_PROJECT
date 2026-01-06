@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:AC164164_mikroproject.X/.generated_files/flags/default/d49f82bd36fed9474eaa188f608f5611e47c4cbd
- -c -mcpu=$(MP_PROCESSOR_OPTION)      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -I"mcc_generated_files/config" -I"mcc_generated_files/winc" -I"mcc_generated_files/drivers" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"C:\Users\wikto\PROJEKT_MIKRO\AC164164-MIKRO_PROJECT\AC164164_mikroproject.X\mcc_generated_files\winc\spi_flash\flexible_flash.c
-========
- -c -mcpu=$(MP_PROCESSOR_OPTION)      -g -D__DEBUG   -mno-eds-warn  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -I"mcc_generated_files/config" -I"mcc_generated_files/winc" -I"mcc_generated_files/drivers" -O0 -msmart-io=1 -Wall -msfr-warn=off    -mdfp="${DFP_DIR}/xc16"C:\Users\gasec\Desktop\Studia_AGH_22-27\V_SEM\Aplikacje_Mikrokontrolerow\AC164164-MIKRO_PROJECT\AC164164_mikroproject.X\main.c
->>>>>>>> Select_city:AC164164_mikroproject.X/.generated_files/flags/default/a7ce431ec0dfdde59ae9383205c16e95da0d289e

@@ -73,6 +73,11 @@
         <itemPath>mcc_generated_files/system.h</itemPath>
         <itemPath>mcc_generated_files/clock.h</itemPath>
         <itemPath>mcc_generated_files/spi2.h</itemPath>
+        <itemPath>mcc_generated_files/i2c1_driver.h</itemPath>
+        <itemPath>mcc_generated_files/i2c_helpers.h</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="RFID" projectFiles="true">
+        <itemPath>RFID/pn532.h</itemPath>
       </logicalFolder>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -145,14 +150,20 @@
         <itemPath>mcc_generated_files/system.c</itemPath>
         <itemPath>mcc_generated_files/clock.c</itemPath>
         <itemPath>mcc_generated_files/spi2.c</itemPath>
+        <itemPath>mcc_generated_files/i2c1_driver.c</itemPath>
+        <itemPath>mcc_generated_files/i2c_helpers.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="RFID" projectFiles="true">
+        <itemPath>RFID/pn532.c</itemPath>
       </logicalFolder>
       <itemPath>main.c</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>mcc_generated_files/examples</Elem>
     <Elem>ILI9341_files</Elem>
     <Elem>Bulb</Elem>
+    <Elem>RFID</Elem>
+    <Elem>mcc_generated_files</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

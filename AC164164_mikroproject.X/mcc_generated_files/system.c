@@ -97,18 +97,19 @@
 #include "pin_manager.h"
 #include "clock.h"
 #include "system.h"
-#include "spi2.h"
+#include "delay.h"
+#include "spi1_driver.h"
+#include "drivers/spi_master.h"
 #include "interrupt_manager.h"
 #include "traps.h"
-#include "drivers/spi_master.h"
-#include "spi1_driver.h"
-#include "delay.h"
+#include "i2c1_driver.h"
+#include "spi2.h"
 
 void SYSTEM_Initialize(void)
 {
     PIN_MANAGER_Initialize();
-    CLOCK_Initialize();
     INTERRUPT_Initialize();
+    CLOCK_Initialize();
     SPI2_Initialize();
 }
 

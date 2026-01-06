@@ -1662,152 +1662,6 @@
 #define TFT_RST_SetDigitalOutput() (_TRISB15 = 0)
 /**
   @Summary
-    Sets the GPIO pin, RB5, high using LATB5.
-
-  @Description
-    Sets the GPIO pin, RB5, high using LATB5.
-
-  @Preconditions
-    The RB5 must be set to an output.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    // Set RB5 high (1)
-    TFT_BL_SetHigh();
-    </code>
-
-*/
-#define TFT_BL_SetHigh()          (_LATB5 = 1)
-/**
-  @Summary
-    Sets the GPIO pin, RB5, low using LATB5.
-
-  @Description
-    Sets the GPIO pin, RB5, low using LATB5.
-
-  @Preconditions
-    The RB5 must be set to an output.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    // Set RB5 low (0)
-    TFT_BL_SetLow();
-    </code>
-
-*/
-#define TFT_BL_SetLow()           (_LATB5 = 0)
-/**
-  @Summary
-    Toggles the GPIO pin, RB5, using LATB5.
-
-  @Description
-    Toggles the GPIO pin, RB5, using LATB5.
-
-  @Preconditions
-    The RB5 must be set to an output.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    // Toggle RB5
-    TFT_BL_Toggle();
-    </code>
-
-*/
-#define TFT_BL_Toggle()           (_LATB5 ^= 1)
-/**
-  @Summary
-    Reads the value of the GPIO pin, RB5.
-
-  @Description
-    Reads the value of the GPIO pin, RB5.
-
-  @Preconditions
-    None.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    uint16_t portValue;
-
-    // Read RB5
-    postValue = TFT_BL_GetValue();
-    </code>
-
-*/
-#define TFT_BL_GetValue()         _RB5
-/**
-  @Summary
-    Configures the GPIO pin, RB5, as an input.
-
-  @Description
-    Configures the GPIO pin, RB5, as an input.
-
-  @Preconditions
-    None.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    // Sets the RB5 as an input
-    TFT_BL_SetDigitalInput();
-    </code>
-
-*/
-#define TFT_BL_SetDigitalInput()  (_TRISB5 = 1)
-/**
-  @Summary
-    Configures the GPIO pin, RB5, as an output.
-
-  @Description
-    Configures the GPIO pin, RB5, as an output.
-
-  @Preconditions
-    None.
-
-  @Returns
-    None.
-
-  @Param
-    None.
-
-  @Example
-    <code>
-    // Sets the RB5 as an output
-    TFT_BL_SetDigitalOutput();
-    </code>
-
-*/
-#define TFT_BL_SetDigitalOutput() (_TRISB5 = 0)
-/**
-  @Summary
     Sets the GPIO pin, RB7, high using LATB7.
 
   @Description
@@ -2390,6 +2244,152 @@
 
 */
 #define SCK1OUT_SetDigitalOutput() (_TRISC2 = 0)
+/**
+  @Summary
+    Sets the GPIO pin, RC4, high using LATC4.
+
+  @Description
+    Sets the GPIO pin, RC4, high using LATC4.
+
+  @Preconditions
+    The RC4 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC4 high (1)
+    LED_GREEN_SetHigh();
+    </code>
+
+*/
+#define LED_GREEN_SetHigh()          (_LATC4 = 1)
+/**
+  @Summary
+    Sets the GPIO pin, RC4, low using LATC4.
+
+  @Description
+    Sets the GPIO pin, RC4, low using LATC4.
+
+  @Preconditions
+    The RC4 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Set RC4 low (0)
+    LED_GREEN_SetLow();
+    </code>
+
+*/
+#define LED_GREEN_SetLow()           (_LATC4 = 0)
+/**
+  @Summary
+    Toggles the GPIO pin, RC4, using LATC4.
+
+  @Description
+    Toggles the GPIO pin, RC4, using LATC4.
+
+  @Preconditions
+    The RC4 must be set to an output.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Toggle RC4
+    LED_GREEN_Toggle();
+    </code>
+
+*/
+#define LED_GREEN_Toggle()           (_LATC4 ^= 1)
+/**
+  @Summary
+    Reads the value of the GPIO pin, RC4.
+
+  @Description
+    Reads the value of the GPIO pin, RC4.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    uint16_t portValue;
+
+    // Read RC4
+    postValue = LED_GREEN_GetValue();
+    </code>
+
+*/
+#define LED_GREEN_GetValue()         _RC4
+/**
+  @Summary
+    Configures the GPIO pin, RC4, as an input.
+
+  @Description
+    Configures the GPIO pin, RC4, as an input.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC4 as an input
+    LED_GREEN_SetDigitalInput();
+    </code>
+
+*/
+#define LED_GREEN_SetDigitalInput()  (_TRISC4 = 1)
+/**
+  @Summary
+    Configures the GPIO pin, RC4, as an output.
+
+  @Description
+    Configures the GPIO pin, RC4, as an output.
+
+  @Preconditions
+    None.
+
+  @Returns
+    None.
+
+  @Param
+    None.
+
+  @Example
+    <code>
+    // Sets the RC4 as an output
+    LED_GREEN_SetDigitalOutput();
+    </code>
+
+*/
+#define LED_GREEN_SetDigitalOutput() (_TRISC4 = 0)
 /**
   @Summary
     Sets the GPIO pin, RC5, high using LATC5.
