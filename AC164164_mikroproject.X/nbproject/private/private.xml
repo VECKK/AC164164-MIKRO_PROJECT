@@ -3,18 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/C:/Users/wikto/PROJEKT_MIKRO/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/mcc_generated_files/winc/driver/winc_adapter.c</file>
-=======
-            <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/ILI9341_files/touch_sensor.c</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/mcc_generated_files/examples/city_menu.c</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/ILI9341_files/keypad.c</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/ILI9341_files/tft_gfx.h</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/ILI9341_files/tft_gfx.c</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/main.c</file>
             <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/mcc_generated_files/examples/wifi_connection.c</file>
-            <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/mcc_generated_files/examples/weather_client.c</file>
->>>>>>> Select_city
+            <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/ILI9341_files/keypad.h</file>
+            <file>file:/C:/Users/gasec/Desktop/Studia_AGH_22-27/V_SEM/Aplikacje_Mikrokontrolerow/AC164164-MIKRO_PROJECT/AC164164_mikroproject.X/mcc_generated_files/examples/city_menu.h</file>
         </group>
     </open-files>
 </project-private>

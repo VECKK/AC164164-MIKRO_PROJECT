@@ -18,11 +18,6 @@
 
 // Bufor na wpisywany PIN
 static char pinBuffer[5] = ""; 
-static char current_email[64] = "";
-
-char* get_user_email(void) {
-    return current_email;
-}
 
 void Draw_Keypad(void) {
     TFT_FillScreen(TFT_BLACK);    
@@ -91,20 +86,6 @@ int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uin
             if (key == 'C') { 
                 if (len > 0) pinBuffer[len-1] = 0;
             } 
-            else if (key == 'K') { 
-                if (strcmp(pinBuffer, USER_PIN) == 0) {
-                    // --- PRZYPISANIE EMAILA ---
-                    strcpy(current_email, "u3359765482@gmail.com");
-                    // --- PIN POPRAWNY ---
-                    TFT_FillScreen(TFT_BLACK);
-                    TFT_Print(80, 100, "LOGOWANIE...", TFT_GREEN, TFT_BLACK, 2);
-                    __delay_ms(1000);
-                    
-                    // Czy?cimy ekran pod nast?pny etap
-                    TFT_FillScreen(TFT_BLACK); 
-                    TFT_Print(10, 70, "POGODA DLA: KRAKOW", TFT_WHITE, TFT_BLACK, 1);
-                    
-                    loginSuccess = true; // Zwracamy sukces!
             else if (key == 'K') { // Wci?ni?to OK
                 
                 if (strcmp(pinBuffer, pin1) == 0) loggedUserIndex = 0;
@@ -112,6 +93,7 @@ int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uin
                 else if (strcmp(pinBuffer, pin3) == 0) loggedUserIndex = 2;
 
                 if (loggedUserIndex != -1) {
+                    // PIN poprawny -> czy?cimy bufor i zwracamy ID
                     pinBuffer[0] = 0;
                     return loggedUserIndex;
                 } else {

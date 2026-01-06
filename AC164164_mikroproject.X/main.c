@@ -4,29 +4,34 @@
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/examples/wifi_connection.h"
 #include "mcc_generated_files/examples/weather_client.h"
+// Dodaj obs?ug? emaila (je?li masz plik nag?ówkowy, odkomentuj)
+#include "mcc_generated_files/examples/email_client.h" 
 #include "ILI9341_files/tft_gfx.h"
 #include "ILI9341_files/touch_sensor.h"
 #include "ILI9341_files/keypad.h"
 #include "mcc_generated_files/examples/city_menu.h"
-#include "mcc_generated_files/examples/email_client.h"
 
 #define FCY 16000000UL
-#define FCY 16000000UL
 #include <libpic30.h>
+
+// --- KONFIGURACJA EMAIL ---
+// Ten sam email dla wszystkich u?ytkowników
+#define DEFAULT_EMAIL "u3359765482@gmail.com" 
 
 // --- STRUKTURA U?YTKOWNIKA ---
 typedef struct {
     char pin[5];            
     uint16_t headerColor;   
     char* startCity;        
-    char name[10];          
+    char name[10];
+    char* email; 
 } UserProfile;
 
-// --- DANE U?YTKOWNIKï¿½W ---
+// --- DANE U?YTKOWNIKÓW ---
 UserProfile users[3] = {
-    {"1234", TFT_CYAN,  "Warszawa", "Lukasz"},
-    {"1111", TFT_RED,   "Krakow",   "Kacper"},
-    {"2222", TFT_GREEN, "Wroclaw",  "Wiktoria"}
+    {"1234", TFT_CYAN,  "Warszawa", "Lukasz",   DEFAULT_EMAIL},
+    {"1111", TFT_RED,   "Krakow",   "Kacper",   DEFAULT_EMAIL},
+    {"2222", TFT_GREEN, "Wroclaw",  "Wiktoria", DEFAULT_EMAIL}
 };
 
 int currentUserIndex = -1;
@@ -42,19 +47,13 @@ typedef enum {
 
 AppState currentState = STATE_WIFI_SELECT;
 
-bool static is_sending_email;
-
-bool static is_sending_email;
-
 // --- FUNKCJA LOGIKI WYLOGOWANIA ---
 void Perform_Logout_Logic(void) {
-    // Animacja graficzna (z city_menu.c)
     Animate_Logout_Click();
     __delay_ms(200);
 
     currentUserIndex = -1;
     
-    // Zmiana ekranu
     TFT_FillScreen(TFT_BLACK);
     Draw_Keypad();
     Update_Pin_Display();
@@ -70,7 +69,7 @@ int main(void) {
     
     wifi_setup();
     weather_client_init();
-
+    
     Draw_Wifi_Menu();
     
     uint16_t x, y;
@@ -82,11 +81,11 @@ int main(void) {
 
     while (1) {
         wifi_task();
-        email_client_task();
+        email_client_task(); // Obs?uga wysy?ania e-maili w tle
         
         switch (currentState) {
             
-            // --- 1. WYBï¿½R SIECI ---
+            // --- 1. WYBÓR SIECI ---
             case STATE_WIFI_SELECT:
                 if (!Touch_IsPressed()) break;
                 if (!Touch_GetCoordinates(&x, &y)) break;
@@ -159,12 +158,12 @@ int main(void) {
                 }
                 break;
 
-            // --- 4. CITY ---
+            // --- 4. WYBÓR MIASTA ---
             case STATE_CITY_SELECT:
                 if (!Touch_IsPressed()) break;
                 if (!Touch_GetCoordinates(&x, &y)) break;
 
-                // A.
+                // A. Wybór miasta
                 int cityIndex = Check_City_Touch(x, y);
                 if (cityIndex != -1) {
                     weather_set_city(polish_cities[cityIndex]);
@@ -175,90 +174,86 @@ int main(void) {
                     currentState = STATE_WEATHER;
                     __delay_ms(500);
                 }
-                // B. LOGOUT (Prawy Gï¿½rny Rï¿½g)
+                // B. LOGOUT (Prawy Górny Róg)
                 else if (Check_Logout_Touch(x, y)) {
                     Perform_Logout_Logic();
                     __delay_ms(500);
                 }
                 break;
 
-            // --- 5. POGODA (G?ï¿½wny ekran) ---
+            // --- 5. POGODA ---
             case STATE_WEATHER:
-                if (is_sending_email) {
-                    break; 
+                if (!weatherScreenInit) {
+                    Draw_Weather_Interface(users[currentUserIndex].headerColor, users[currentUserIndex].name);
+                    weatherScreenInit = true;
                 }
-                if (!Touch_IsPressed()) break;
-                if (!Touch_GetCoordinates(&x, &y)) break;
+            
+                // Obs?uga dotyku (NAJPIERW - aby móc wyj??)
+                if (Touch_IsPressed()) {
+                    if (Touch_GetCoordinates(&x, &y)) {
+                        
+                        // 1. ZMIANA KOLORU (Suwak - Lewy Dó?)
+                        if (x >= SLIDER_X && x <= (SLIDER_X + SLIDER_W) &&
+                            y >= SLIDER_Y && y <= (SLIDER_Y + SLIDER_H)) 
+                        {
+                            if (last_slider_x != -1) {
+                                uint16_t old_rel_x = last_slider_x - SLIDER_X;
+                                uint8_t old_hue = (old_rel_x * 255) / SLIDER_W;
+                                TFT_FillRect(last_slider_x, SLIDER_Y, 2, SLIDER_H, Color_Wheel(old_hue));
+                            }
 
-                // 1. ZMIANA KOLORU (Suwak - definicje z city_menu.h)
-                if (x >= SLIDER_X && x <= (SLIDER_X + SLIDER_W) &&
-                    y >= SLIDER_Y && y <= (SLIDER_Y + SLIDER_H)) 
-                {
-                    if (last_slider_x != -1) {
-                        uint16_t old_rel_x = last_slider_x - SLIDER_X;
-                        uint8_t old_hue = (old_rel_x * 255) / SLIDER_W;
-                        TFT_FillRect(last_slider_x, SLIDER_Y, 2, SLIDER_H, Color_Wheel(old_hue));
+                            uint16_t rel_x = x - SLIDER_X;
+                            uint8_t hue = (rel_x * 255) / SLIDER_W;
+                            uint16_t newColor = Color_Wheel(hue);
+                            
+                            users[currentUserIndex].headerColor = newColor;
+
+                            TFT_FillRect(x, SLIDER_Y, 2, SLIDER_H, TFT_WHITE);
+                            last_slider_x = x; 
+
+                            TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, newColor);
+                            char headerText[30];
+                            sprintf(headerText, "POGODA - %s", users[currentUserIndex].name);
+                            TFT_Print(5, 8, headerText, TFT_BLACK, newColor, 2);
+                        }
+                        
+                        // 2. WYSY?ANIE E-MAILA (Nad Returnem)
+                        else if (Check_Email_Touch(x, y)) {
+                            Animate_Email_Click();
+                            
+                            char weather_data[128] = "Brak danych";
+                            weather_get_last_data(weather_data); 
+                            
+                            char* targetEmail = users[currentUserIndex].email;
+                            
+                            if (strlen(targetEmail) > 0) {
+                                email_send_start(targetEmail, "Raport Pogodowy", weather_data);
+                            } else {
+                                TFT_Print(10, 260, "Brak emaila!", TFT_RED, TFT_BLACK, 1);
+                            }
+                            
+                            __delay_ms(500);
+                            Draw_Email_Button(); // Od?wie? przycisk
+                        }
+
+                        // 3. LOGOUT (Prawy Górny Róg)
+                        else if (Check_Logout_Touch(x, y)) {
+                             weather_client_reset(); 
+                             Perform_Logout_Logic();
+                             break; // Wyj?cie
+                        }
+
+                        // 4. RETURN (Prawy Dolny Róg)
+                        else if (x >= BUTTON_X && y >= RETURN_Y) { 
+                            weather_client_reset(); 
+                            Draw_City_Menu(); 
+                            currentState = STATE_CITY_SELECT;
+                            break; // Wyj?cie
+                        }
                     }
-
-                    uint16_t rel_x = x - SLIDER_X;
-                    uint8_t hue = (rel_x * 255) / SLIDER_W;
-                    uint16_t newColor = Color_Wheel(hue);
-                    
-                    users[currentUserIndex].headerColor = newColor;
-
-                    TFT_FillRect(x, SLIDER_Y, 2, SLIDER_H, TFT_WHITE);
-                    last_slider_x = x; 
-
-                    TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, newColor);
-                    char headerText[30];
-                    sprintf(headerText, "POGODA - %s", users[currentUserIndex].name);
-                    TFT_Print(5, 8, headerText, TFT_BLACK, newColor, 2);
-                }
-                
-                // 2. PRZYCISK LOGOUT (Prawy Gï¿½rny Rï¿½g)
-                else if (Check_Logout_Touch(x, y)) {
-                     weather_client_reset(); // Stop pobierania danych
-                     Perform_Logout_Logic();
-                     break; // Wyj?cie, aby nie rysowa? dalej
                 }
 
-                // 3. PRZYCISK RETURN (Prawy Dolny Rï¿½g)
-                else if (x > 200 && y > 200) { 
-                    TFT_DrawRect(BUTTON_X, RETURN_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
-                    weather_client_reset(); 
-                    Draw_City_Menu(); 
-                    currentState = STATE_CITY_SELECT;
-                    __delay_ms(500);
-                } else if (Check_Send_Touch(x, y)) {
-                    // Animacja klikni?cia (rysowanie bia?ego prostok?ta)
-                    TFT_FillRect(200, 150, 110, 39, TFT_WHITE);
-                    TFT_Print(210, 160, "Sending", TFT_BLACK, TFT_WHITE, 2);
-                    __delay_ms(100);
-
-                    // 1. Pobierz e-mail u?ytkownika
-                    char* target = get_user_email();
-
-                    // 2. Sprawd? czy e-mail zosta? ustawiony (czy by?o logowanie)
-                    if (strlen(target) > 0) {
-                        // Pobierz dane pogodowe
-                        char weather_data[128];
-                        weather_get_last_data(weather_data);
-
-                        // Rozpocznij wysy?anie
-                        email_send_start(target, "Raport Pogodowy", weather_data);
-                        is_sending_email = true;
-                    } else {
-                        // B??d - brak e-maila (u?ytkownik pomin?? logowanie?)
-                        TFT_Print(10, 260, "Blad: Brak Email!", TFT_RED, TFT_BLACK, 1);
-                        Draw_Send_Button();
-                    }
-
-                    while(Touch_IsPressed());
-                }
-                    break; // Wyj?cie
-                }
-                
-                // Aktualizacja w tle (tylko gdy nie ma akcji wyj?cia)
+                // Aktualizacja w tle (tylko gdy nie wychodzimy)
                 weather_client_task();
                 
                 break;

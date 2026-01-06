@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-// --- KONFIGURACJA UI POGODY (Wspï¿½lne wymiary) ---
+// --- KONFIGURACJA UI POGODY ---
 #define HEADER_X      0
 #define HEADER_Y      0
 #define HEADER_W      320
@@ -15,38 +15,36 @@
 #define SLIDER_W      180
 #define SLIDER_H      36
 
-// --- POZYCJE PRZYCISKï¿½W ---
+// --- POZYCJE PRZYCISKÓW ---
 #define BUTTON_X      200 
 #define BUTTON_W      110
 #define BUTTON_H      39
-#define LOGOUT_Y      40  // Prawy Gï¿½RNY rï¿½g
-#define RETURN_Y      200 // Prawy DOLNY rï¿½g
+
+// Pozycje Y (Prawa kolumna)
+#define LOGOUT_Y      40   // Góra
+#define EMAIL_Y       155  // Nad Returnem
+#define RETURN_Y      200  // Dó?
 
 // Deklaracja tablicy miast
 extern const char* polish_cities[5];
 
 // --- FUNKCJE GUI ---
-
-// Rysuje menu miast
 void Draw_City_Menu(void);
-
-// Sprawdza dotyk na li?cie miast
 int Check_City_Touch(uint16_t tx, uint16_t ty);
 
-// Rysuje ca?y interfejs pogody (Nag?ï¿½wek, Suwak, Przyciski)
 void Draw_Weather_Interface(uint16_t headerColor, char* userName);
 
-// Rysuje przyciski
+// Rysowanie przycisków
 void Draw_Return_Button(void);
 void Draw_Logout_Button(void);
+void Draw_Email_Button(void);
 
-// Animacja klikni?cia wylogowania (migni?cie na bia?o)
+// Animacje
 void Animate_Logout_Click(void);
+void Animate_Email_Click(void);
 
-void Draw_Send_Button(void);
-bool Check_Send_Touch(uint16_t tx, uint16_t ty);
-
-// Sprawdzenie dotyku przyciskï¿½w
+// Sprawdzanie dotyku
 bool Check_Logout_Touch(uint16_t tx, uint16_t ty);
+bool Check_Email_Touch(uint16_t tx, uint16_t ty);
 
 #endif
