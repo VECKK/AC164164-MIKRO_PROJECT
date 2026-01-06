@@ -29,7 +29,7 @@ typedef struct {
 NetworkCreds myNetworks[4] = {
     {"UPC20B118",          "yws6npVtqeub"},
     {"iPhone",             "wik 1234"},
-    {"Majki_WiFi_5G",      "MajkiInternet61"},
+    {"UPC6EFBFAF",      "FCwpkcn6wfcv"},
     {"Gonsi S23 Ultra 5G", "12345678"}
 };
 

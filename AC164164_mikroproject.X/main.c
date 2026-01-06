@@ -23,6 +23,8 @@ typedef enum {
 
 AppState currentState = STATE_WIFI_SELECT;
 
+bool static is_sending_email;
+
 int main(void) {
     SYSTEM_Initialize();
     TFT_Init();
@@ -135,12 +137,21 @@ int main(void) {
 
             // --- 5. POGODA ---
             case STATE_WEATHER:
+                if (is_sending_email && !email_is_busy()) {
+                    is_sending_email = false;
+                    TFT_FillRect(200, 150, 110, 39, TFT_WHITE);
+                    TFT_Print(230, 160, "SENT", TFT_BLACK, TFT_WHITE, 2);
+                }
+                if (is_sending_email) {
+                    break; 
+                }
                 // Obs?uga przycisku RETURN
                 if (!Touch_IsPressed()){
                     weather_client_task();
                     break;
                 }
-                if (!Touch_GetCoordinates(&x, &y)) break; 
+                if (!Touch_GetCoordinates(&x, &y)) break;
+                
                 if (y > 200 && x > 200) { 
                     weather_client_reset(); 
 
@@ -151,8 +162,8 @@ int main(void) {
                 } else if (Check_Send_Touch(x, y)) {
                     // Animacja klikni?cia (rysowanie bia?ego prostok?ta)
                     TFT_FillRect(200, 150, 110, 39, TFT_WHITE);
+                    TFT_Print(210, 160, "Sending", TFT_BLACK, TFT_WHITE, 2);
                     __delay_ms(100);
-                    Draw_Send_Button(); // Przywró? zielony kolor
 
                     // 1. Pobierz e-mail u?ytkownika
                     char* target = get_user_email();
@@ -165,12 +176,14 @@ int main(void) {
 
                         // Rozpocznij wysy?anie
                         email_send_start(target, "Raport Pogodowy", weather_data);
+                        is_sending_email = true;
                     } else {
                         // B??d - brak e-maila (u?ytkownik pomin?? logowanie?)
                         TFT_Print(10, 260, "Blad: Brak Email!", TFT_RED, TFT_BLACK, 1);
+                        Draw_Send_Button();
                     }
 
-                    __delay_ms(1000); // Debounce - zapobiega wielokrotnemu wys?aniu
+                    while(Touch_IsPressed());
                 }
                 break;
         }
