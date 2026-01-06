@@ -1,12 +1,7 @@
-/* * File:   keypad.c
- * Author: User
- */
-
 #include "keypad.h"
 #include "tft_gfx.h"
 #include "touch_sensor.h"
 
-// Definicja FCY dla __delay_ms (musi by? przed libpic30.h)
 #ifndef FCY
 #define FCY 16000000UL 
 #endif
@@ -21,9 +16,8 @@
 #define UPDATE_PIN_X 30
 #define UPDATE_PIN_Y 2
 
-// Dane u?ytkownika
+// Bufor na wpisywany PIN
 static char pinBuffer[5] = ""; 
-const char USER_PIN[] = "1234";
 static char current_email[64] = "";
 
 char* get_user_email(void) {
@@ -44,15 +38,10 @@ void Draw_Keypad(void) {
         uint16_t x = KEY_START_X + col * (KEY_W + KEY_GAP);
         uint16_t y = KEY_START_Y + row * (KEY_H + KEY_GAP);
         
-        // --- DOBÓR KOLORÓW Z POPRAWK? DLA EKRANU BGR ---
         uint16_t color;
-        if (i == 9) {
-            color = TFT_RED; 
-        } else if (i == 11) {
-            color = TFT_GREEN; 
-        } else {
-            color = TFT_BLUE; 
-        }
+        if (i == 9) color = TFT_RED; 
+        else if (i == 11) color = TFT_GREEN; 
+        else color = TFT_BLUE; 
 
         TFT_FillRect(x, y, KEY_W, KEY_H, color);
         TFT_Print(x + 20, y + 10, labels[i], TFT_WHITE, color, 2);
@@ -68,9 +57,10 @@ void Update_Pin_Display(void) {
     TFT_Print(UPDATE_PIN_X + 20, UPDATE_PIN_Y, mask, TFT_YELLOW, TFT_BLACK, 2);
 }
 
-bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
+// Zwraca: -1 (brak sukcesu/pisanie), 0 (User 1), 1 (User 2), 2 (User 3)
+int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uint16_t tx, uint16_t ty) {
     char keys[12] = {'1','2','3', '4','5','6', '7','8','9', 'C','0','K'}; 
-    bool loginSuccess = false;
+    int loggedUserIndex = -1; // Domy?lnie brak sukcesu
 
     for(int i=0; i<12; i++) {
         int row = i / 3;
@@ -85,11 +75,11 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
             TFT_FillRect(bx, by, KEY_W, KEY_H, TFT_WHITE);
             __delay_ms(100);
             
-            // --- Przywracanie koloru  ---
+            // Przywracanie koloru
             uint16_t color;
-            if (i == 9) color = TFT_RED;      
+            if (i == 9) color = TFT_RED;       
             else if (i == 11) color = TFT_GREEN; 
-            else color = TFT_BLUE;            
+            else color = TFT_BLUE;             
             
             TFT_FillRect(bx, by, KEY_W, KEY_H, color);
             char label[3] = {key == 'K' ? 'O' : key, key == 'K' ? 'K' : 0, 0};
@@ -115,12 +105,21 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
                     TFT_Print(10, 70, "POGODA DLA: KRAKOW", TFT_WHITE, TFT_BLACK, 1);
                     
                     loginSuccess = true; // Zwracamy sukces!
+            else if (key == 'K') { // Wci?ni?to OK
+                
+                if (strcmp(pinBuffer, pin1) == 0) loggedUserIndex = 0;
+                else if (strcmp(pinBuffer, pin2) == 0) loggedUserIndex = 1;
+                else if (strcmp(pinBuffer, pin3) == 0) loggedUserIndex = 2;
+
+                if (loggedUserIndex != -1) {
+                    pinBuffer[0] = 0;
+                    return loggedUserIndex;
                 } else {
                     // --- PIN B??DNY ---
                     TFT_FillRect(38, 210, 136, 20, TFT_YELLOW); 
                     TFT_Print(42, 214, "BLEDNY KOD!", TFT_RED, TFT_YELLOW, 2);
                     __delay_ms(1000);
-                    TFT_FillRect(38, 210, 136, 20, TFT_BLACK); // Wyczysc komunikat
+                    TFT_FillRect(38, 210, 136, 20, TFT_BLACK); 
                     
                     pinBuffer[0] = 0; 
                 }
@@ -129,11 +128,12 @@ bool Handle_Login_Touch(uint16_t tx, uint16_t ty) {
                 pinBuffer[len] = key;
                 pinBuffer[len+1] = 0;
             }
-            if(!loginSuccess) Update_Pin_Display();
+            
+            if(loggedUserIndex == -1) Update_Pin_Display();
             while(Touch_IsPressed()); // Debouncing
             
-            return loginSuccess; 
+            return loggedUserIndex; 
         }
     }
-    return false;
+    return -1;
 }

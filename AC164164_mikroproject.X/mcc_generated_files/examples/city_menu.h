@@ -1,45 +1,52 @@
-/* Microchip Technology Inc. and its subsidiaries.  You may use this software 
- * and any derivatives exclusively with Microchip products. 
- * 
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS".  NO WARRANTIES, WHETHER 
- * EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED 
- * WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A 
- * PARTICULAR PURPOSE, OR ITS INTERACTION WITH MICROCHIP PRODUCTS, COMBINATION 
- * WITH ANY OTHER PRODUCTS, OR USE IN ANY APPLICATION. 
- *
- * IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, 
- * INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND 
- * WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS 
- * BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE 
- * FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS 
- * IN ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF 
- * ANY, THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
- *
- * MICROCHIP PROVIDES THIS SOFTWARE CONDITIONALLY UPON YOUR ACCEPTANCE OF THESE 
- * TERMS. 
- */
-
-/* 
- * File:   
- * Author: 
- * Comments:
- * Revision history: 
- */
-
 #ifndef CITY_MENU_H
 #define CITY_MENU_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
+// --- KONFIGURACJA UI POGODY (Wsp�lne wymiary) ---
+#define HEADER_X      0
+#define HEADER_Y      0
+#define HEADER_W      320
+#define HEADER_H      30
+
+#define SLIDER_X      10
+#define SLIDER_Y      202
+#define SLIDER_W      180
+#define SLIDER_H      36
+
+// --- POZYCJE PRZYCISK�W ---
+#define BUTTON_X      200 
+#define BUTTON_W      110
+#define BUTTON_H      39
+#define LOGOUT_Y      40  // Prawy G�RNY r�g
+#define RETURN_Y      200 // Prawy DOLNY r�g
+
+// Deklaracja tablicy miast
 extern const char* polish_cities[5];
 
-// Deklaracje funkcji
+// --- FUNKCJE GUI ---
+
+// Rysuje menu miast
 void Draw_City_Menu(void);
+
+// Sprawdza dotyk na li?cie miast
 int Check_City_Touch(uint16_t tx, uint16_t ty);
+
+// Rysuje ca?y interfejs pogody (Nag?�wek, Suwak, Przyciski)
+void Draw_Weather_Interface(uint16_t headerColor, char* userName);
+
+// Rysuje przyciski
 void Draw_Return_Button(void);
+void Draw_Logout_Button(void);
+
+// Animacja klikni?cia wylogowania (migni?cie na bia?o)
+void Animate_Logout_Click(void);
 
 void Draw_Send_Button(void);
 bool Check_Send_Touch(uint16_t tx, uint16_t ty);
 
-#endif // CITY_MENU_H
+// Sprawdzenie dotyku przycisk�w
+bool Check_Logout_Touch(uint16_t tx, uint16_t ty);
+
+#endif
