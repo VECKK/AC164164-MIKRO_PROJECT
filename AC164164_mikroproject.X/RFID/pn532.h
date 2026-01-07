@@ -6,8 +6,8 @@
 
 // Struktura przechowuj?ca dane odczytanego tagu
 typedef struct {
-    uint8_t uid[7];  // Unikalny ID (UID) - max 7 bajtów dla Mifare
-    uint8_t uidLen;  // D?ugo?? UID (zazwyczaj 4 lub 7)
+    uint8_t uid[7];
+    uint8_t uidLen;
 } PN532_Tag;
 
 /**

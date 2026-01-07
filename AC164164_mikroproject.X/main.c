@@ -4,7 +4,6 @@
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/examples/wifi_connection.h"
 #include "mcc_generated_files/examples/weather_client.h"
-// Odkomentuj, je?li masz ten plik w projekcie
 #include "mcc_generated_files/examples/email_client.h" 
 #include "ILI9341_files/tft_gfx.h"
 #include "ILI9341_files/touch_sensor.h"
@@ -13,97 +12,13 @@
 #include "mcc_generated_files/i2c1_driver.h"
 #include "RFID/pn532.h"
 #include "mcc_generated_files/examples/city_menu.h"
+#include "mcc_generated_files/examples/user_manager.h" 
 
 #define FCY 16000000UL
 #define PN532_I2C_ADDR (0x48 >> 1)
-
 #include <libpic30.h>
 
-// --- KONFIGURACJA EMAIL ---
-#define DEFAULT_EMAIL "u3359765482@gmail.com" 
-
-// --- STRUKTURA U?YTKOWNIKA ---
-typedef struct {
-    char pin[5];            
-    uint16_t headerColor;   
-    char* startCity;        
-    char name[10];
-    char* email;
-    uint8_t rfid_uid[4]; 
-} UserProfile;
-
-// --- DANE U?YTKOWNIKÓW ---
-UserProfile users[3] = {
-    {"1111", TFT_CYAN,  "Warszawa", "Lukasz",   DEFAULT_EMAIL, {0xAA, 0xFC, 0x98, 0x04}},  
-    {"2222", TFT_RED,   "Krakow",   "Kacper",   DEFAULT_EMAIL, {0xBC, 0x4A, 0x7E, 0x05}}, 
-    {"3333", TFT_GREEN, "Wroclaw",  "Wiktoria", DEFAULT_EMAIL, {0x5B, 0x7C, 0x57, 0x1F}} 
-};
-
-int currentUserIndex = -1;
-
-// --- STANY APLIKACJI ---
-typedef enum {
-    STATE_WIFI_SELECT,
-    STATE_CONNECTING,
-    STATE_LOGIN,
-    STATE_CITY_SELECT,
-    STATE_WEATHER
-} AppState;
-
 AppState currentState = STATE_WIFI_SELECT;
-
-// --- FUNKCJE POMOCNICZE ---
-
-int FindUserByCard(PN532_Tag* tag) {
-    if (tag->uidLen != 4) return -1; 
-    for (int i = 0; i < 3; i++) {
-        if (memcmp(tag->uid, users[i].rfid_uid, 4) == 0) {
-            return i; 
-        }
-    }
-    return -1; 
-}
-
-void Perform_Logout_Logic(void) {
-    Animate_Logout_Click();
-    __delay_ms(100); // Krótszy czas
-
-    currentUserIndex = -1;
-    
-    // Zatrzymujemy klienta pogody
-    weather_client_reset(); 
-    
-    // --- FIX: Resetujemy czytnik RFID, ?eby "wsta?" na nowo ---
-    PN532_Init(); 
-    
-    TFT_FillScreen(TFT_BLACK);
-    Draw_Keypad();
-    Update_Pin_Display();
-    
-    currentState = STATE_LOGIN;
-}
-
-// --- DEBUG MODE (Zakomentowany) ---
-/*
-void Run_RFID_Debug_Loop(void) {
-    PN532_Tag debugTag;
-    TFT_FillScreen(TFT_BLACK);
-    TFT_Print(10, 10, "TRYB DEBUG RFID", TFT_WHITE, TFT_BLACK, 2);
-    while(1) {
-        if (PN532_ReadPassiveTargetID(&debugTag)) {
-            TFT_FillScreen(TFT_BLUE);
-            char uidBuf[50];
-            sprintf(uidBuf, "%02X %02X %02X %02X", 
-                    debugTag.uid[0], debugTag.uid[1], 
-                    debugTag.uid[2], debugTag.uid[3]);
-            TFT_Print(10, 90, uidBuf, TFT_YELLOW, TFT_BLUE, 3);
-            __delay_ms(2000); 
-            TFT_FillScreen(TFT_BLACK);
-        }
-        __delay_ms(100);
-    }
-}
-*/
 
 // --- MAIN ---
 int main(void) {
@@ -111,15 +26,12 @@ int main(void) {
     TFT_Init();
     Touch_Init();
     
-    // Inicjalizacja I2C i RFID
     i2c1_driver_driver_open();
     if (PN532_Init()) {
         LED_GREEN_SetHigh(); 
         __delay_ms(200);
         LED_GREEN_SetLow();
     } 
-    
-    // Run_RFID_Debug_Loop(); // ODKOMENTUJ TYLKO DO ODCZYTU NOWYCH KART
     
     PN532_Tag currentTag;
     
@@ -135,12 +47,9 @@ int main(void) {
     bool weatherScreenInit = false; 
     int last_slider_x = -1; 
     
-    // Zmienne do interwa?u RFID (Fix dla blokowania dotyku)
     int rfid_scan_counter = 0;
-    const int RFID_SCAN_INTERVAL = 30; // Co ile p?tli skanowa? (30 * 10ms = 300ms)
 
     while (1) {
-        // 1. Zadania globalne (zawsze dzia?aj?)
         wifi_task();
         email_client_task(); 
         
@@ -198,59 +107,73 @@ int main(void) {
                 }
                 break;
 
+            // --- 3. LOGOWANIE PINEM I RFID ---
             case STATE_LOGIN:
-                // A. Obs?uga Dotyku (SZYBKA - w ka?dej p?tli)
+                // A. Obsluga Dotyku
                 if (Touch_IsPressed()) {
                     if (Touch_GetCoordinates(&x, &y)) {
                         int loggedID = Handle_Login_Touch(users[0].pin, users[1].pin, users[2].pin, x, y);
                         if (loggedID != -1) {
                             currentUserIndex = loggedID;
-                            rfid_scan_counter = 0; // Reset licznika
+                            rfid_scan_counter = 0; 
                         }
                     }
                 }
 
-                // B. Obs?uga RFID (WOLNA - raz na ~500ms)
-                // Zwi?ksz interwa? do 50, ?eby rzadziej blokowa? procesor
-                // 50 * 10ms = 500ms (pó? sekundy)
+                // B. Obsluga RFID
                 if (currentUserIndex == -1) { 
                     rfid_scan_counter++;
                     if (rfid_scan_counter >= 50) { 
                         
-                        // Tutaj nast?pi próba odczytu (mo?e zaj?? do 100-200ms w pn532.c)
                         if (PN532_ReadPassiveTargetID(&currentTag)) {
                             int detectedUser = FindUserByCard(&currentTag);
                             
                             if (detectedUser != -1) {
                                 currentUserIndex = detectedUser;
-                                TFT_Print(20, 280, "Karta OK!", TFT_GREEN, TFT_BLACK, 2);
                             } else {
-                                // Opcjonalnie: mrugnij, ?e karta nieznana, ale nie blokuj
-                                // TFT_Print(20, 280, "Nieznana!", TFT_RED, TFT_BLACK, 2);
+                                // Komunikat bledu + aktywne oczekiwanie
+                                TFT_FillRect(18, 210, 205, 20, TFT_YELLOW); 
+                                TFT_Print(22, 214, "Brak uzytkownika", TFT_RED, TFT_YELLOW, 2);
+                                
+                                for(int k=0; k<100; k++) {
+                                    wifi_task();         
+                                    email_client_task(); 
+                                    __delay_ms(10);
+                                }
+                                
+                                TFT_FillRect(18, 210, 205, 20, TFT_BLACK);
                             }
                         }
                         rfid_scan_counter = 0; 
                     }
                 }
 
-                // C. Przej?cie dalej
+                // C. Logowanie udane - Powitanie
                 if (currentUserIndex != -1) {
+                    TFT_FillScreen(TFT_BLACK);
+                    
+                    char welcomeBuf[40];
+                    sprintf(welcomeBuf, "Witaj %s!", users[currentUserIndex].name);
+                    TFT_Print(20, 140, welcomeBuf, TFT_GREEN, TFT_BLACK, 3);
+                    
+                    for(int i=0; i<150; i++) {
+                        wifi_task();
+                        email_client_task();
+                        __delay_ms(10);
+                    }
+
                     weather_set_city(users[currentUserIndex].startCity);
                     weather_client_reset();
                     
                     weatherScreenInit = false; 
                     last_slider_x = -1;
                     
-                    // Wa?ne: Wyczy?? ekran RAZ przed zmian? stanu,
-                    // ?eby pozby? si? "duchów" klawiatury/b??dów
                     TFT_FillScreen(TFT_BLACK); 
-                    
                     currentState = STATE_WEATHER;
-                    // Bez delaya tutaj, ?eby od razu rysowa?
                 }
                 break;
 
-            // --- 4. WYBÓR MIASTA ---
+            // --- 4. WYBOR MIASTA ---
             case STATE_CITY_SELECT:
                 if (Touch_IsPressed()) {
                     if (Touch_GetCoordinates(&x, &y)) {
@@ -258,14 +181,13 @@ int main(void) {
                         if (cityIndex != -1) {
                             weather_set_city(polish_cities[cityIndex]);
                             weather_client_reset(); 
-                            
                             weatherScreenInit = false; 
                             last_slider_x = -1;
                             currentState = STATE_WEATHER;
                             __delay_ms(500);
                         }
                         else if (Check_Logout_Touch(x, y)) {
-                            Perform_Logout_Logic();
+                            Perform_Logout_Logic(&currentState);
                             __delay_ms(500);
                         }
                     }
@@ -274,15 +196,11 @@ int main(void) {
 
             // --- 5. POGODA ---
             case STATE_WEATHER:
-                // !!! POPRAWKA 1: weather_client_task TYLKO w tym stanie !!!
-                weather_client_task(); 
-            
                 if (!weatherScreenInit) {
                     Draw_Weather_Interface(users[currentUserIndex].headerColor, users[currentUserIndex].name);
                     weatherScreenInit = true;
                 }
             
-                // Obs?uga dotyku
                 if (Touch_IsPressed()) {
                     if (Touch_GetCoordinates(&x, &y)) {
                         
@@ -306,36 +224,58 @@ int main(void) {
                             sprintf(headerText, "POGODA - %s", users[currentUserIndex].name);
                             TFT_Print(5, 8, headerText, TFT_BLACK, newColor, 2);
                         }
-                        // E-mail
+                        
+                        // WYSYLANIE EMAILA
                         else if (Check_Email_Touch(x, y)) {
                             Animate_Email_Click();
+                            
+                            weather_client_reset();
+                            for(int k=0; k<100; k++) { wifi_task(); __delay_ms(10); }
+
+                            TFT_Print(10, 260, "Wysylanie...", TFT_YELLOW, TFT_BLACK, 1);
+                            
                             char weather_data[128] = "Brak danych";
                             weather_get_last_data(weather_data); 
+                            
                             char* targetEmail = users[currentUserIndex].email;
+                            
                             if (strlen(targetEmail) > 0) {
                                 email_send_start(targetEmail, "Raport Pogodowy", weather_data);
+                                
+                                for(int i=0; i<600; i++) { 
+                                    wifi_task();         
+                                    email_client_task(); 
+                                    __delay_ms(10);
+                                }
+                                TFT_Print(10, 260, "Wyslano!      ", TFT_GREEN, TFT_BLACK, 1);
                             } else {
                                 TFT_Print(10, 260, "Brak emaila!", TFT_RED, TFT_BLACK, 1);
                             }
-                            __delay_ms(500);
-                            Draw_Email_Button();
+                            
+                            __delay_ms(1000); 
+                            Draw_Email_Button(); 
+                            TFT_FillRect(10, 260, 200, 20, TFT_BLACK); 
                         }
+
                         // Logout
                         else if (Check_Logout_Touch(x, y)) {
-                             Perform_Logout_Logic();
+                             Perform_Logout_Logic(&currentState);
                         }
                         // Return
                         else if (x >= BUTTON_X && y >= RETURN_Y) { 
                             weather_client_reset(); 
                             Draw_City_Menu(); 
                             currentState = STATE_CITY_SELECT;
+                            break;
                         }
                     }
                 }
+                
+                weather_client_task();
                 break;
         }
         
-        __delay_ms(10); // Krótkie opó?nienie p?tli
+        __delay_ms(10); 
     }
     return 1;
 }

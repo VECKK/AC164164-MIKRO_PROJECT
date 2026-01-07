@@ -6,16 +6,12 @@
 #include "../../ILI9341_files/tft_gfx.h"
 
 // --- KONFIGURACJA GMAIL ---
-// Musisz u?y? "App Password" z ustawie? konta Google, nie zwyk?ego has?a!
-// Dane musz? by? zakodowane w Base64 (u?yj konwertera online)
-// Przyk?ad dla "baba@gmail.com": YmFiYUBnbWFpbC5jb20=
 #define SMTP_SERVER         "smtp.gmail.com"
 #define SMTP_PORT           465 // Port SSL
 #define SMTP_USERNAME_BASE64 "dTMzNTk3NjU0ODJAZ21haWwuY29t" 
 #define SMTP_PASSWORD_BASE64 "aXd4bW5kYmJ4emdydW16bg=="
-#define SENDER_EMAIL        "u3359765482@gmail.com" // Ten sam co w loginie
+#define SENDER_EMAIL        "u3359765482@gmail.com"
 
-// Stany maszyny SMTP
 typedef enum {
     EMAIL_IDLE,
     EMAIL_RESOLVE,
@@ -39,7 +35,6 @@ static uint32_t server_ip = 0;
 static char send_buffer[512];
 static uint8_t recv_buffer[256];
 
-// Dane tymczasowe
 static char target_email[64];
 static char email_body[128];
 
@@ -72,7 +67,7 @@ void email_client_task(void) {
         case EMAIL_RESOLVE:
             registerSocketCallback(email_socket_cb, email_resolve_cb);
             gethostbyname((uint8_t*)SMTP_SERVER);
-            state = EMAIL_CONNECTING; // Czekamy na callback
+            state = EMAIL_CONNECTING;
             break;
             
         case EMAIL_DONE:
@@ -86,7 +81,7 @@ void email_client_task(void) {
             break;
             
         default:
-            // Reszta dzieje si? w callbackach lub czekamy na dane
+            
             break;
     }
 }
@@ -96,14 +91,8 @@ void email_client_task(void) {
 static void email_resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP) {
     if (u32ServerIP != 0) {
         server_ip = u32ServerIP;
-        // Gmail wymaga SSL (u?ywamy socket zabezpieczony je?li WINC na to pozwala, 
-        // tutaj u?yjemy standardowego, ale dla Gmaila port 465 wymaga SSL)
-        // W standardowym API WINC1500 'socket' to TCP. Do SSL nale?y u?y? 'm2m_ssl_connect' 
-        // lub skonfigurowa? socket jako SSL. 
-        // DLA UPROSZCZENIA PRZYK?ADU u?ywamy standardowego connect, 
-        // ale w prawdziwym ?yciu dla Gmaila trzeba by tu u?y? secure socket layer.
         
-        email_socket = socket(AF_INET, SOCK_STREAM, 1); // 1 = SSL socket (zale?y od wersji firmware WINC)
+        email_socket = socket(AF_INET, SOCK_STREAM, 1);
         
         if (email_socket >= 0) {
             struct sockaddr_in addr;
@@ -113,7 +102,7 @@ static void email_resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP) {
             connect(email_socket, (struct sockaddr *)&addr, sizeof(addr));
         }
     } else {
-        state = EMAIL_IDLE; // B??d DNS
+        state = EMAIL_IDLE;
         TFT_Print(10, 260, "Blad DNS Email", TFT_RED, TFT_BLACK, 1);
     }
 }
@@ -143,8 +132,6 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
         {
             tstrSocketRecvMsg *pstrRecv = (tstrSocketRecvMsg *)pvMsg;
             if (pstrRecv && pstrRecv->s16BufferSize > 0) {
-                // Prosta maszyna stanów SMTP
-                // Odbieramy odpowied?, wysy?amy nast?pn? komend?
                 
                 switch(state) {
                     case EMAIL_WAIT_GREETING:
@@ -154,8 +141,6 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
                         break;
                         
                     case EMAIL_SEND_AUTH_LOGIN:
-                        // Gmail wymaga STARTTLS na porcie 587, lub SSL od razu na 465.
-                        // Zak?adamy po??czenie SSL.
                         sprintf(send_buffer, "AUTH LOGIN\r\n");
                         send_cmd(send_buffer);
                         state = EMAIL_SEND_USER;
@@ -192,14 +177,13 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
                         break;
                         
                     case EMAIL_SEND_CONTENT:
-                        // Budowanie tre?ci e-maila
                         sprintf(send_buffer, 
                             "From: %s\r\n"
                             "To: %s\r\n"
                             "Subject: Pogoda z PIC32\r\n"
-                            "\r\n" // Pusta linia oddziela nag?ówki od tre?ci
+                            "\r\n"
                             "Dzisiejsza pogoda:\r\n%s\r\n"
-                            ".\r\n", // Kropka ko?czy wiadomo??
+                            ".\r\n",
                             SENDER_EMAIL, target_email, email_body);
                         send_cmd(send_buffer);
                         state = EMAIL_SEND_QUIT;

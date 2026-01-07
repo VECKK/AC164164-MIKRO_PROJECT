@@ -11,7 +11,7 @@
 
 #define FCY 16000000UL
 #include <libpic30.h>
-// Definicja tablicy miast
+
 const char* polish_cities[5] = {"Krakow", "Warszawa", "Wroclaw", "Gdansk", "Zakopane"};
 
 void Draw_City_Menu(void) {
@@ -97,6 +97,9 @@ void Animate_Logout_Click(void) {
 }
 
 void Animate_Email_Click(void) {
+    TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
+    TFT_Print(BUTTON_X + 10, EMAIL_Y + 14, "Sending", TFT_BLACK, TFT_WHITE, 2);
+    __delay_ms(1000);
     TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
     TFT_Print(BUTTON_X + 30, EMAIL_Y + 14, "SENT", TFT_BLACK, TFT_WHITE, 2);
     __delay_ms(1000);

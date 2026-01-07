@@ -23,6 +23,7 @@
           <itemPath>mcc_generated_files/examples/weather_client.h</itemPath>
           <itemPath>mcc_generated_files/examples/city_menu.h</itemPath>
           <itemPath>mcc_generated_files/examples/email_client.h</itemPath>
+          <itemPath>mcc_generated_files/examples/user_manager.h</itemPath>
         </logicalFolder>
         <logicalFolder name="winc" displayName="winc" projectFiles="true">
           <logicalFolder name="common" displayName="common" projectFiles="true">
@@ -115,6 +116,7 @@
           <itemPath>mcc_generated_files/examples/weather_client.c</itemPath>
           <itemPath>mcc_generated_files/examples/city_menu.c</itemPath>
           <itemPath>mcc_generated_files/examples/email_client.c</itemPath>
+          <itemPath>mcc_generated_files/examples/user_manager.c</itemPath>
         </logicalFolder>
         <logicalFolder name="winc" displayName="winc" projectFiles="true">
           <logicalFolder name="driver" displayName="driver" projectFiles="true">
