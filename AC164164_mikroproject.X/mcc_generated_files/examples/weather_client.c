@@ -56,7 +56,7 @@ void weather_client_reset(void) {
     }
     connection_ready = false;
     server_resolved = false;
-    g_recv_offset = 0; // Reset licznika
+    g_recv_offset = 0;
 }
 
 void weather_get_last_data(char* buffer) {
@@ -95,7 +95,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
         case SOCKET_MSG_CONNECT:
             if (pstrConnect && pstrConnect->s8Error == SOCK_ERR_NO_ERROR)
             {
-                // Resetujemy bufor przy nowym po??czeniu
                 g_recv_offset = 0;
                 memset(recv_buffer, 0, BUFFER_SIZE);
 
@@ -119,7 +118,6 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
             break;
             
         case SOCKET_MSG_SEND:
-            // Odbieramy pierwszy kawa?ek danych
             recv(tcp_client_socket, recv_buffer, sizeof(recv_buffer), 0);
             break;
         
