@@ -16,12 +16,10 @@
 #define UPDATE_PIN_X 30
 #define UPDATE_PIN_Y 2
 
-// Bufor na wpisywany PIN
 static char pinBuffer[5] = ""; 
 
 void Draw_Keypad(void) {
-    TFT_FillScreen(TFT_BLACK);    
-    // Rysowanie pola na wpisany kod (gwiazdki)
+    TFT_FillScreen(TFT_BLACK);
     TFT_FillRect(KEY_START_X, KEY_START_Y +(KEY_H + KEY_GAP)* 4 , KEY_START_X +(KEY_W + KEY_GAP)* 3, 2, TFT_WHITE); 
     
     char labels[12][3] = {"1","2","3", "4","5","6", "7","8","9", "C","0","OK"};
@@ -52,10 +50,9 @@ void Update_Pin_Display(void) {
     TFT_Print(UPDATE_PIN_X + 20, UPDATE_PIN_Y, mask, TFT_YELLOW, TFT_BLACK, 2);
 }
 
-// Zwraca: -1 (brak sukcesu/pisanie), 0 (User 1), 1 (User 2), 2 (User 3)
 int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uint16_t tx, uint16_t ty) {
     char keys[12] = {'1','2','3', '4','5','6', '7','8','9', 'C','0','K'}; 
-    int loggedUserIndex = -1; // Domy?lnie brak sukcesu
+    int loggedUserIndex = -1;
 
     for(int i=0; i<12; i++) {
         int row = i / 3;
@@ -66,11 +63,9 @@ int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uin
         if (Is_Btn_Pressed(tx, ty, bx, by, KEY_W, KEY_H)) {
             char key = keys[i];
             
-            // Animacja klikni?cia
             TFT_FillRect(bx, by, KEY_W, KEY_H, TFT_WHITE);
             __delay_ms(100);
             
-            // Przywracanie koloru
             uint16_t color;
             if (i == 9) color = TFT_RED;       
             else if (i == 11) color = TFT_GREEN; 
@@ -86,14 +81,14 @@ int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uin
             if (key == 'C') { 
                 if (len > 0) pinBuffer[len-1] = 0;
             } 
-            else if (key == 'K') { // Wci?ni?to OK
+            else if (key == 'K') {
                 
                 if (strcmp(pinBuffer, pin1) == 0) loggedUserIndex = 0;
                 else if (strcmp(pinBuffer, pin2) == 0) loggedUserIndex = 1;
                 else if (strcmp(pinBuffer, pin3) == 0) loggedUserIndex = 2;
 
                 if (loggedUserIndex != -1) {
-                    // PIN poprawny -> czy?cimy bufor i zwracamy ID
+                    // PIN poprawny
                     pinBuffer[0] = 0;
                     return loggedUserIndex;
                 } else {
@@ -112,7 +107,7 @@ int Handle_Login_Touch(const char* pin1, const char* pin2, const char* pin3, uin
             }
             
             if(loggedUserIndex == -1) Update_Pin_Display();
-            while(Touch_IsPressed()); // Debouncing
+            while(Touch_IsPressed());
             
             return loggedUserIndex; 
         }

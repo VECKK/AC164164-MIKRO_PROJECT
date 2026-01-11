@@ -7,7 +7,6 @@
 #include "../mcc_generated_files/spi2.h"
 #include "../mcc_generated_files/pin_manager.h"
 
-// Definicja FCY dla __delay_ms (Wymagane przez libpic30.h)
 #ifndef FCY
 #define FCY 8000000UL // 16 MHz (Dla 32MHz Fosc)
 #endif
@@ -52,7 +51,7 @@ void TFT_Init(void) {
     
     // Ustawienie orientacji (opcjonalne)
     TFT_WriteCommand(0x36); // Memory Access Control
-    TFT_WriteData(0x20);   // 
+    TFT_WriteData(0x20);
 }
 
 void TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
@@ -128,7 +127,7 @@ void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, u
                     TFT_DrawPixel(x + i, y + j, color);
                 else
                     TFT_FillRect(x + (i * size), y + (j * size), size, size, color);
-            } else if (bg != color) { // Rysuj tlo tylko jesli jest inne nie kolor tekstu
+            } else if (bg != color) {
                 if (size == 1)
                     TFT_DrawPixel(x + i, y + j, bg);
                 else

@@ -6,7 +6,7 @@
 
 // Flagi statusu
 extern bool wifi_connected;
-extern bool wifi_connect_error; // <--- NOWA FLAGA B??DU
+extern bool wifi_connect_error;
 
 void wifi_setup(void);
 void wifi_task(void);

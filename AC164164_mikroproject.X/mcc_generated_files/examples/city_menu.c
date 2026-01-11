@@ -48,12 +48,10 @@ void Draw_Weather_Interface(uint16_t headerColor, char* userName) {
     TFT_Print(5, 8, headerText, TFT_BLACK, headerColor, 2);
     
     // 2. Przyciski
-    Draw_Logout_Button(); // Prawy Górny
-    Draw_Email_Button();  // Nad Returnem
-    Draw_Return_Button(); // Prawy Dolny
+    Draw_Logout_Button();
+    Draw_Email_Button();
+    Draw_Return_Button();
 
-    // 3. Suwak (Lewy Dolny)
-    // Funkcja TFT_Draw_Rainbow_Bar musi by? dost?pna w tft_gfx.h/c
     TFT_Draw_Rainbow_Bar(SLIDER_X, SLIDER_Y, SLIDER_W, SLIDER_H);
 }
 
@@ -68,6 +66,7 @@ void Draw_Logout_Button(void) {
 }
 
 void Draw_Email_Button(void) {
+    TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
     TFT_DrawRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_GREEN);
     TFT_Print(BUTTON_X + 25, EMAIL_Y + 14, "EMAIL", TFT_WHITE, TFT_BLACK, 2);
 }
@@ -96,14 +95,11 @@ void Animate_Logout_Click(void) {
     TFT_DrawRect(BUTTON_X, LOGOUT_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
 }
 
-void Animate_Email_Click(void) {
+void Animate_Sending_Button(void) {
     TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
     TFT_Print(BUTTON_X + 10, EMAIL_Y + 14, "Sending", TFT_BLACK, TFT_WHITE, 2);
-    __delay_ms(1000);
+}
+void Animate_Sent_Button(void) {
     TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
     TFT_Print(BUTTON_X + 30, EMAIL_Y + 14, "SENT", TFT_BLACK, TFT_WHITE, 2);
-    __delay_ms(1000);
-    TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
-    TFT_DrawRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_GREEN);
-    TFT_Print(BUTTON_X + 25, EMAIL_Y + 14, "EMAIL", TFT_WHITE, TFT_BLACK, 2);
 }

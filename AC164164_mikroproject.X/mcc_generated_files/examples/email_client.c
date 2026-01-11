@@ -32,11 +32,11 @@ typedef enum {
 static SOCKET email_socket = -1;
 static EmailState state = EMAIL_IDLE;
 static uint32_t server_ip = 0;
-static char send_buffer[512];
+static char send_buffer[1024];
 static uint8_t recv_buffer[256];
 
 static char target_email[64];
-static char email_body[128];
+static char email_body[512];
 
 // Prototypy
 static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg);
@@ -53,8 +53,11 @@ bool email_is_busy(void) {
 void email_send_start(char* to, char* subject, char* body) {
     if (state != EMAIL_IDLE) return;
     
-    strcpy(target_email, to);
-    strcpy(email_body, body);
+    strncpy(target_email, to, sizeof(target_email) - 1);
+    target_email[sizeof(target_email) - 1] = '\0';
+    
+    strncpy(email_body, body, sizeof(email_body) - 1);
+    email_body[sizeof(email_body) - 1] = '\0';
     
     TFT_FillRect(10, 260, 200, 20, TFT_BLACK);
     TFT_Print(10, 260, "Wysylanie email...", TFT_YELLOW, TFT_BLACK, 1);
@@ -122,6 +125,8 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
                 state = EMAIL_WAIT_GREETING;
                 recv(email_socket, recv_buffer, sizeof(recv_buffer), 0);
             } else {
+                close(email_socket);
+                email_socket = -1;
                 state = EMAIL_IDLE;
                 TFT_Print(10, 260, "Blad polaczenia Email", TFT_RED, TFT_BLACK, 1);
             }
@@ -182,7 +187,7 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
                             "To: %s\r\n"
                             "Subject: Pogoda z PIC32\r\n"
                             "\r\n"
-                            "Dzisiejsza pogoda:\r\n%s\r\n"
+                            "Prognoza pogody\r\n%s\r\n"
                             ".\r\n",
                             SENDER_EMAIL, target_email, email_body);
                         send_cmd(send_buffer);
@@ -201,6 +206,11 @@ static void email_socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg) {
                 
                 if (state != EMAIL_DONE) {
                     recv(email_socket, recv_buffer, sizeof(recv_buffer), 0);
+                }
+                else {
+                    close(email_socket);
+                    email_socket = -1;
+                    state = EMAIL_IDLE;
                 }
             }
         }

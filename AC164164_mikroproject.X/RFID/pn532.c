@@ -1,7 +1,6 @@
 #include "pn532.h"
-#include <string.h> // Do memcpy
+#include <string.h>
 
-// Dostosuj ?cie?ki zale?nie od struktury projektu
 #include "../mcc_generated_files/mcc.h"
 #include "../mcc_generated_files/i2c1_driver.h"
 
@@ -16,11 +15,11 @@
 #define FCY 16000000UL
 #include <libpic30.h>
 
-// --- FUNKCJE POMOCNICZE I2C (STATIC - tylko dla tego pliku) ---
+// --- FUNKCJE POMOCNICZE I2C ---
 
 static void I2C_Wait(void) {
-    i2c1_waitForEvent(NULL); // Czekaj na flag? przerwania
-    i2c1_clearIRQ();         // Wyczy?? flag? po operacji
+    i2c1_waitForEvent(NULL);
+    i2c1_clearIRQ();
 }
 
 static bool I2C_WriteBytes(uint8_t addr, uint8_t* data, uint8_t len) {
@@ -89,7 +88,7 @@ static bool PN532_IsReady(void) {
     i2c1_driver_startRX();
     I2C_Wait();
     status = i2c1_driver_getRXData();
-    i2c1_driver_sendNACK(); // Czytamy tylko 1 bajt statusu
+    i2c1_driver_sendNACK();
     I2C_Wait();
     
     i2c1_driver_stop();
@@ -137,15 +136,13 @@ bool PN532_Init(void) {
     uint8_t cmd[] = { 0x14, 0x01, 0x14, 0x01 };
     PN532_WriteCommand(cmd, sizeof(cmd));
     
-    // Czekamy chwil?
     __delay_ms(20);
     
-    // Sprawdzamy czy modu? odpowiedzia? (ACK)
     uint8_t ackBuff[6];
     if (PN532_ReadResponse(ackBuff, 6)) {
-        return true; // Modu? ?yje!
+        return true;
     }
-    return false; // Brak komunikacji (z?e kable/zasilanie)
+    return false;
 }
 
 bool PN532_ReadPassiveTargetID(PN532_Tag *tagWskaznik) {

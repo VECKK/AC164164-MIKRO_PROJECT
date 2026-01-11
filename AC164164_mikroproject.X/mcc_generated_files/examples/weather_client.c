@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "../examples/wifi_connection.h" // Upewnij si?, ?e ?cie?ka jest poprawna
+#include "../examples/wifi_connection.h"
 #include "../winc/socket/socket.h"
 #include "../../ILI9341_files/tft_gfx.h"
 
@@ -12,66 +12,58 @@
 #define WEATHER_SERVER_NAME   "api.openweathermap.org"
 #define WEATHER_SERVER_PORT   80
 #define WEATHER_API_KEY       "b2cc6d9d9380482947d40baf1ccb8c54"
-#define BUFFER_SIZE           1024
+
+#define BUFFER_SIZE           4096 
 
 /* ===================== ZMIENNE GLOBALNE ===================== */
 static SOCKET tcp_client_socket = -1;
 static uint32_t weather_server_ip = 0;
 static bool server_resolved = false;
 static bool connection_ready = false;
-static char http_request[BUFFER_SIZE];
+
+static char http_request[512];
 static uint8_t recv_buffer[BUFFER_SIZE];
-static char display_buffer[64]; // Pomocniczy bufor do sprintf
-static char selected_city[32] = "Krakow"; // Domy?lne miasto
-static char last_weather_info[128] = "Brak danych pogodowych.";
+static uint16_t g_recv_offset = 0;
+
+static char display_buffer[64];
+static char selected_city[32] = "Krakow";
+static char last_weather_info[512] = "Brak danych pogodowych.";
 
 /* ===================== PROTOTYPY ===================== */
 static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg);
 static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP);
 
-/**
- * Initialization
- */
-void weather_client_init(void)
-{
-    // Opcjonalnie wyczysc obszar statusu pogody
-}
+void weather_client_init(void) { }
 
 void weather_set_city(const char* new_city) {
-    // Kopiujemy nazw? miasta do zmiennej globalnej
     strncpy(selected_city, new_city, sizeof(selected_city) - 1);
 }
 
 void weather_client_task(void)
 {
-    // Uruchamiamy pobieranie tylko gdy jest Wi-Fi i nie jestesmy w trakcie polaczenia
     if (wifi_connected && !connection_ready && tcp_client_socket == -1)
     {
         registerSocketCallback(socket_cb, resolve_cb);
         gethostbyname((const char *)WEATHER_SERVER_NAME);
-        
-        // Ustawiamy flage, zeby nie wywolywal DNS w kólko
-        connection_ready = true; // Tymczasowo blokujemy ponowne wejscie
+        connection_ready = true;
     }
 }
 
 void weather_client_reset(void) {
-    // Zamykamy socket je?li otwarty i resetujemy flagi
     if (tcp_client_socket != -1) {
         close(tcp_client_socket);
         tcp_client_socket = -1;
     }
-    connection_ready = false; // To pozwoli funkcji task ponownie wywo?a? DNS
-    server_resolved = false;  // Wymu? ponowne rozwi?zanie nazwy (opcjonalne, ale bezpieczne)
+    connection_ready = false;
+    server_resolved = false;
+    g_recv_offset = 0; // Reset licznika
 }
 
 void weather_get_last_data(char* buffer) {
-    strcpy(buffer, last_weather_info);
+    strncpy(buffer, last_weather_info, 511);
+    buffer[511] = '\0';
 }
 
-/**
- * CALLBACK DNS
- */
 static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP)
 {
     if (u32ServerIP != 0)
@@ -79,29 +71,19 @@ static void resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP)
         weather_server_ip = u32ServerIP;
         server_resolved = true;
         
-
-        /* Open socket TCP */
         tcp_client_socket = socket(AF_INET, SOCK_STREAM, 0);
-        if (tcp_client_socket < 0)
-        {
-            connection_ready = false; 
-            return;
-        }
+        if (tcp_client_socket < 0) { connection_ready = false; return; }
 
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_port = _htons(WEATHER_SERVER_PORT);
         addr.sin_addr.s_addr = weather_server_ip;
 
-        if (connect(tcp_client_socket, (struct sockaddr *)&addr, sizeof(addr)) != SOCK_ERR_NO_ERROR)
-        {
+        if (connect(tcp_client_socket, (struct sockaddr *)&addr, sizeof(addr)) != SOCK_ERR_NO_ERROR) {
             connection_ready = false;
         }
     }
-    else
-    {
-        connection_ready = false;
-    }
+    else { connection_ready = false; }
 }
 
 static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
@@ -113,11 +95,13 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
         case SOCKET_MSG_CONNECT:
             if (pstrConnect && pstrConnect->s8Error == SOCK_ERR_NO_ERROR)
             {
-                
-                // Pelny naglówek HTTP
-                memset(http_request, 0, BUFFER_SIZE);
-                snprintf(http_request, BUFFER_SIZE,
-                        "GET /data/2.5/weather?q=%s&appid=%s&units=metric HTTP/1.1\r\n"
+                // Resetujemy bufor przy nowym po??czeniu
+                g_recv_offset = 0;
+                memset(recv_buffer, 0, BUFFER_SIZE);
+
+                memset(http_request, 0, sizeof(http_request));
+                snprintf(http_request, sizeof(http_request),
+                        "GET /data/2.5/forecast?q=%s&appid=%s&units=metric&cnt=8 HTTP/1.1\r\n"
                         "Host: %s\r\n"
                         "User-Agent: PIC32Client\r\n"
                         "Connection: close\r\n"
@@ -135,123 +119,117 @@ static void socket_cb(SOCKET sock, uint8_t u8Msg, void *pvMsg)
             break;
             
         case SOCKET_MSG_SEND:
-        {
-            
-            // Mówimy modulowi: "Jestem gotowy na dane, wrzuc je do recv_buffer"
+            // Odbieramy pierwszy kawa?ek danych
             recv(tcp_client_socket, recv_buffer, sizeof(recv_buffer), 0);
-        }
-        break;
-        // ----------------------------------
+            break;
         
         case SOCKET_MSG_RECV:
         {
             tstrSocketRecvMsg *pstrRecv = (tstrSocketRecvMsg *)pvMsg;
 
-            // Sprawdzamy, czy odebrano dane (rozmiar > 0)
             if (pstrRecv && pstrRecv->s16BufferSize > 0)
             {
-                char *pcIndxPtr;
-                char *pcEndPtr;
-                char *tmpPtr;
+                g_recv_offset += pstrRecv->s16BufferSize;
                 
-                // Bufory na wyniki (zainicjalizowane jako N/A na wypadek bledu)
-                char city[32] = "N/A";
-                char temp[16] = "N/A";
-                char cond[32] = "N/A";
+                if (g_recv_offset >= BUFFER_SIZE) g_recv_offset = BUFFER_SIZE - 1;
+                recv_buffer[g_recv_offset] = '\0';
 
-                // --- 1. OMIJANIE NAG?ÓWKÓW HTTP ---
-                // Szukamy podwójnego znaku nowej linii, który oddziela naglówki od tresci (JSON)
-                pcIndxPtr = strstr((char*)pstrRecv->pu8Buffer, "\r\n\r\n");
+                int count = 0;
+                char* p = (char*)recv_buffer;
+                while((p = strstr(p, "\"dt_txt\"")) != NULL) {
+                    count++;
+                    p++;
+                }
+
+                if (count < 8) {
+                    recv(tcp_client_socket, recv_buffer + g_recv_offset, BUFFER_SIZE - g_recv_offset, 0);
+                    return;
+                }
                 
-                if (pcIndxPtr) 
-                {
-                    pcIndxPtr += 4; // Przesuwamy wska?nik za "\r\n\r\n" -> tu zaczyna si? JSON
-                }
-                else 
-                {
-                    // Jesli nie znaleziono naglówków, zakladamy, ze caly bufor to dane
-                    pcIndxPtr = (char*)pstrRecv->pu8Buffer; 
-                }
+                char *pcIndxPtr = strstr((char*)recv_buffer, "\r\n\r\n");
+                if (pcIndxPtr) pcIndxPtr += 4;
+                else pcIndxPtr = (char*)recv_buffer; 
 
-                // --- 2. PARSOWANIE MIASTA ("name") ---
-                tmpPtr = strstr(pcIndxPtr, "\"name\"");
-                if (tmpPtr)
-                {
-                    tmpPtr = strchr(tmpPtr, ':'); // Szukamy dwukropka
-                    if (tmpPtr) 
-                    {
-                        tmpPtr++; // Przeskakujemy dwukropek
-                        if(*tmpPtr == '\"') tmpPtr++; // Przeskakujemy cudzys'ów otwierajacy
-                        
-                        pcEndPtr = strchr(tmpPtr, '\"'); // Szukamy cudzyslowu zamykajacego
-                        if(pcEndPtr) *pcEndPtr = 0; // Wstawiamy NULL (uci?cie stringa) w miejscu koncowego cudzys?owu
-                        
-                        strncpy(city, tmpPtr, sizeof(city)-1); // Kopiujemy wynik
-                    }
-                }
+                sprintf(last_weather_info, "Miasto: %s\nGodz  |  Temp   | Warunki\n----------------------------------\n", selected_city);
 
-                // --- 3. PARSOWANIE TEMPERATURY ("temp") ---
-                tmpPtr = strstr(pcIndxPtr, "\"temp\"");
-                if(tmpPtr)
-                {
+                char *searchPtr = pcIndxPtr;
+                char temp[16], cond[32], timeStr[8];
+                char *tmpPtr, *pcEndPtr;
+
+                for (int i = 0; i < 8; i++) {
+                    strcpy(temp, "--"); strcpy(cond, "--"); strcpy(timeStr, "??:??");
+
+                    // A. Temperatura
+                    tmpPtr = strstr(searchPtr, "\"temp\"");
+                    if (!tmpPtr) break; 
                     tmpPtr = strchr(tmpPtr, ':');
-                    if(tmpPtr)
-                    {
+                    if(tmpPtr) {
                         tmpPtr++;
-                        // Temperatura to liczba, konczy sie przecinkiem lub klamra zamykajac?
-                        pcEndPtr = strpbrk(tmpPtr, ",}"); 
-                        if(pcEndPtr) *pcEndPtr = 0;
-                        strncpy(temp, tmpPtr, sizeof(temp)-1);
-                    }
-                }
-
-                // --- 4. PARSOWANIE WARUNKÓW ("weather" -> "main") ---
-                // "weather" jest tablica obiektów, wiec szukamy najpierw "weather", a potem "main" wewnatrz
-                tmpPtr = strstr(pcIndxPtr, "\"weather\"");
-                if(tmpPtr)
-                {
-                    tmpPtr = strstr(tmpPtr, "\"main\"");
-                    if(tmpPtr)
-                    {
-                        tmpPtr = strchr(tmpPtr, ':');
-                        if(tmpPtr)
-                        {
-                            tmpPtr++;
-                            if(*tmpPtr == '\"') tmpPtr++;
-                            pcEndPtr = strchr(tmpPtr, '\"');
-                            if(pcEndPtr) *pcEndPtr = 0;
-                            strncpy(cond, tmpPtr, sizeof(cond)-1);
+                        pcEndPtr = strpbrk(tmpPtr, ",}");
+                        if(pcEndPtr) {
+                            *pcEndPtr = 0;
+                            strncpy(temp, tmpPtr, 15);
+                            *pcEndPtr = ','; 
                         }
                     }
+
+                    // B. Pogoda
+                    char* weatherSec = strstr(tmpPtr, "\"weather\"");
+                    if (weatherSec) {
+                         char* mainDesc = strstr(weatherSec, "\"main\":");
+                         if (mainDesc) {
+                             mainDesc = strchr(mainDesc, ':');
+                             if(mainDesc) {
+                                 mainDesc++; 
+                                 if(*mainDesc == '\"') mainDesc++; 
+                                 pcEndPtr = strchr(mainDesc, '\"'); 
+                                 if(pcEndPtr) {
+                                     *pcEndPtr = 0;
+                                     strncpy(cond, mainDesc, 31);
+                                     *pcEndPtr = '\"';
+                                     tmpPtr = pcEndPtr; 
+                                 }
+                             }
+                         }
+                    }
+
+                    // C. Czas
+                    char* dtTag = strstr(tmpPtr, "\"dt_txt\"");
+                    if (dtTag) {
+                        char* spacePtr = strchr(dtTag, ' ');
+                        if (spacePtr) {
+                            strncpy(timeStr, spacePtr + 1, 5);
+                            timeStr[5] = '\0';
+                        }
+                        searchPtr = dtTag + 10; 
+                    } else {
+                        searchPtr = tmpPtr + 20; 
+                    }
+
+                    // EKRAN
+                    if (i == 0) {
+                        sprintf(display_buffer, "M: %s", selected_city);
+                        TFT_Print(10, 100, display_buffer, TFT_YELLOW, TFT_BLACK, 2);
+                        sprintf(display_buffer, "T: %s C", temp);
+                        TFT_Print(10, 140, display_buffer, TFT_WHITE, TFT_BLACK, 2);
+                        sprintf(display_buffer, "W: %s", cond);
+                        TFT_Print(10, 180, display_buffer, TFT_CYAN, TFT_BLACK, 2);
+                    }
+
+                    // MAIL
+                    char lineBuffer[64];
+                    sprintf(lineBuffer, "%s | %-6s C | %s\n", timeStr, temp, cond);
+                    if (strlen(last_weather_info) + strlen(lineBuffer) < 511) {
+                        strcat(last_weather_info, lineBuffer);
+                    }
                 }
-
-                // --- 5. WY?WIETLANIE NA EKRANIE (3 LINIE) ---
-                // Upewnij sie, ze display_buffer jest zadeklarowany w pliku (np. static char display_buffer[64];)
                 
-                // Linia 1: Miasto 
-                sprintf(display_buffer, "M: %s", city);
-                TFT_Print(10, 100, display_buffer, TFT_YELLOW, TFT_BLACK, 2);
-
-                // Linia 2: Temperatura 
-                sprintf(display_buffer, "T: %s C", temp);
-                TFT_Print(10, 140, display_buffer, TFT_WHITE, TFT_BLACK, 2);
-
-                // Linia 3: Warunki 
-                sprintf(display_buffer, "W: %s", cond);
-                TFT_Print(10, 180, display_buffer, TFT_CYAN, TFT_BLACK, 2);
-                
-                sprintf(last_weather_info, "Miasto: %s\nTemp: %s C\nWarunki: %s", city, temp, cond);
-                
-                // --- 6. ZAMKNIECIE POLACZENIA ---
-                // Wazne: Zwalniamy gniazdo po odebraniu danych
                 close(tcp_client_socket);
                 tcp_client_socket = -1;
                 connection_ready = false; 
             }
             else
             {
-                // Obsluga przypadku, gdy serwer zamknal polaczenie (EOF) lub blad
-                printf("Remote close\r\n");
                 close(tcp_client_socket);
                 tcp_client_socket = -1;
                 connection_ready = false;

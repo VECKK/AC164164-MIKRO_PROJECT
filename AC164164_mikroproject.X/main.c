@@ -151,6 +151,9 @@ int main(void) {
                 // C. Logowanie udane - Powitanie
                 if (currentUserIndex != -1) {
                     TFT_FillScreen(TFT_BLACK);
+
+                    weather_set_city(users[currentUserIndex].startCity);
+                    weather_client_reset();
                     
                     char welcomeBuf[40];
                     sprintf(welcomeBuf, "Witaj %s!", users[currentUserIndex].name);
@@ -161,9 +164,6 @@ int main(void) {
                         email_client_task();
                         __delay_ms(10);
                     }
-
-                    weather_set_city(users[currentUserIndex].startCity);
-                    weather_client_reset();
                     
                     weatherScreenInit = false; 
                     last_slider_x = -1;
@@ -227,14 +227,14 @@ int main(void) {
                         
                         // WYSYLANIE EMAILA
                         else if (Check_Email_Touch(x, y)) {
-                            Animate_Email_Click();
+                            Animate_Sending_Button();
                             
                             weather_client_reset();
                             for(int k=0; k<100; k++) { wifi_task(); __delay_ms(10); }
 
                             TFT_Print(10, 260, "Wysylanie...", TFT_YELLOW, TFT_BLACK, 1);
                             
-                            char weather_data[128] = "Brak danych";
+                            char weather_data[512] = "Brak danych";
                             weather_get_last_data(weather_data); 
                             
                             char* targetEmail = users[currentUserIndex].email;
@@ -242,12 +242,21 @@ int main(void) {
                             if (strlen(targetEmail) > 0) {
                                 email_send_start(targetEmail, "Raport Pogodowy", weather_data);
                                 
-                                for(int i=0; i<600; i++) { 
+                                int timeout = 0;
+                                
+                                while(email_is_busy() && timeout < 1500) { 
                                     wifi_task();         
                                     email_client_task(); 
                                     __delay_ms(10);
+                                    timeout++;
                                 }
-                                TFT_Print(10, 260, "Wyslano!      ", TFT_GREEN, TFT_BLACK, 1);
+                                if (!email_is_busy()) {
+                                    Animate_Sent_Button();
+                                    TFT_Print(10, 260, "Wyslano!      ", TFT_GREEN, TFT_BLACK, 1);
+                                } else {
+                                    TFT_Print(10, 260, "TIMEOUT BLAD!", TFT_RED, TFT_BLACK, 1);
+                                    email_client_init();
+                                }
                             } else {
                                 TFT_Print(10, 260, "Brak emaila!", TFT_RED, TFT_BLACK, 1);
                             }
@@ -260,6 +269,7 @@ int main(void) {
                         // Logout
                         else if (Check_Logout_Touch(x, y)) {
                              Perform_Logout_Logic(&currentState);
+                             break;
                         }
                         // Return
                         else if (x >= BUTTON_X && y >= RETURN_Y) { 

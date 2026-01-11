@@ -1,8 +1,3 @@
-/*
- * tft_gfx.h
- * Sterownik ILI9341 - Nag?ówek
- */
-
 #ifndef TFT_GFX_H
 #define TFT_GFX_H
 

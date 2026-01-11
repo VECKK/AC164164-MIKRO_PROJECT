@@ -20,10 +20,9 @@
 #define BUTTON_W      110
 #define BUTTON_H      39
 
-// Pozycje Y (Prawa kolumna)
-#define LOGOUT_Y      40   // Góra
-#define EMAIL_Y       155  // Nad Returnem
-#define RETURN_Y      200  // Dó?
+#define LOGOUT_Y      40
+#define EMAIL_Y       155
+#define RETURN_Y      200
 
 // Deklaracja tablicy miast
 extern const char* polish_cities[5];
@@ -41,7 +40,8 @@ void Draw_Email_Button(void);
 
 // Animacje
 void Animate_Logout_Click(void);
-void Animate_Email_Click(void);
+void Animate_Sending_Button(void);
+void Animate_Sent_Button(void);
 
 // Sprawdzanie dotyku
 bool Check_Logout_Touch(uint16_t tx, uint16_t ty);
