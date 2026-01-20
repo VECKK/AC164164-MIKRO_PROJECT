@@ -1,11 +1,9 @@
 #include "pn532.h"
 #include <string.h>
-
 #include "../mcc_generated_files/mcc.h"
 #include "../mcc_generated_files/i2c1_driver.h"
 
-// --- DEFINICJE WEWN?TRZNE ---
-#define PN532_I2C_ADDR        (0x48 >> 1) // Adres 7-bitowy (0x24)
+#define PN532_I2C_ADDR        (0x48 >> 1) 
 #define PN532_PREAMBLE        0x00
 #define PN532_STARTCODE1      0x00
 #define PN532_STARTCODE2      0xFF
@@ -14,8 +12,6 @@
 
 #define FCY 16000000UL
 #include <libpic30.h>
-
-// --- FUNKCJE POMOCNICZE I2C ---
 
 static void I2C_Wait(void) {
     i2c1_waitForEvent(NULL);
@@ -26,7 +22,6 @@ static bool I2C_WriteBytes(uint8_t addr, uint8_t* data, uint8_t len) {
     i2c1_driver_start();
     I2C_Wait();
 
-    // Adres + Write (bit 0)
     i2c1_driver_TXData(addr << 1);
     I2C_Wait();
     if (i2c1_driver_isNACK()) { i2c1_driver_stop(); I2C_Wait(); return false; }
@@ -46,7 +41,6 @@ static bool I2C_ReadBytes(uint8_t addr, uint8_t* data, uint8_t len) {
     i2c1_driver_start();
     I2C_Wait();
 
-    // Adres + Read (bit 1)
     i2c1_driver_TXData((addr << 1) | 1);
     I2C_Wait();
     if (i2c1_driver_isNACK()) { i2c1_driver_stop(); I2C_Wait(); return false; }
@@ -59,7 +53,7 @@ static bool I2C_ReadBytes(uint8_t addr, uint8_t* data, uint8_t len) {
         if (i < len - 1) {
             i2c1_driver_sendACK();
         } else {
-            i2c1_driver_sendNACK(); // Ostatni bajt = NACK
+            i2c1_driver_sendNACK();
         }
         I2C_Wait();
     }
@@ -69,14 +63,12 @@ static bool I2C_ReadBytes(uint8_t addr, uint8_t* data, uint8_t len) {
     return true;
 }
 
-// --- FUNKCJE WEWN?TRZNE PN532 ---
-
 static bool PN532_IsReady(void) {
     uint8_t status = 0;
     i2c1_driver_start();
     I2C_Wait();
     
-    i2c1_driver_TXData((PN532_I2C_ADDR << 1) | 1); // READ
+    i2c1_driver_TXData((PN532_I2C_ADDR << 1) | 1); 
     I2C_Wait();
     
     if (i2c1_driver_isNACK()) { 
@@ -129,8 +121,6 @@ static bool PN532_ReadResponse(uint8_t* buffer, uint8_t maxLen) {
     }
     return I2C_ReadBytes(PN532_I2C_ADDR, buffer, maxLen);
 }
-
-// --- FUNKCJE PUBLICZNE (API) ---
 
 bool PN532_Init(void) {
     uint8_t cmd[] = { 0x14, 0x01, 0x14, 0x01 };

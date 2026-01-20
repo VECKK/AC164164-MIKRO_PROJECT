@@ -13,6 +13,7 @@
                 <sourceRootElem>Bulb</sourceRootElem>
                 <sourceRootElem>RFID</sourceRootElem>
                 <sourceRootElem>mcc_generated_files</sourceRootElem>
+                <sourceRootElem>GESTY</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

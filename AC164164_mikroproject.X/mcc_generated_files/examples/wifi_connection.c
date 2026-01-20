@@ -5,18 +5,15 @@
 #include "../winc/include/winc_legacy.h"
 #include "../pin_manager.h"
 #include "wifi_connection.h"
-
-// Do??czamy grafik?
 #include "../../ILI9341_files/tft_gfx.h" 
 
-// --- KONFIGURACJA WYGL?DU PRZYCISKÓW ---
+// --- KONFIGURACJA WYGLADU PRZYCISKÓW ---
 #define BTN_START_X      10   
 #define BTN_START_Y      40   
 #define BTN_WIDTH        220  
 #define BTN_HEIGHT       30   
 #define BTN_GAP          10   
 
-// Tekst statusu
 #define TEXT_X 20
 #define TEXT_Y 240 
 
@@ -38,10 +35,9 @@ bool wifi_connected = false;
 bool wifi_connect_error = false;
 static char status_buffer[64];
 
-// --- FUNKCJE WEWN?TRZNE (POMOCNICZE) ---
+// --- FUNKCJE WEWNETRZNE---
 void winc_register_init(void);
 
-// Funkcja prywatna
 void wifi_connect_dynamic(char* ssid, char* password) {
     wifi_connected = false;
     wifi_connect_error = false; 
@@ -67,7 +63,6 @@ void wifi_connect_dynamic(char* ssid, char* password) {
 }
 
 // --- FUNKCJE GUI ---
-
 void Draw_Wifi_Menu(void) {
     TFT_FillScreen(TFT_BLACK);
     TFT_Print(10, 10, "WYBIERZ SIEC WI-FI:", TFT_YELLOW, TFT_BLACK, 2);
@@ -75,10 +70,8 @@ void Draw_Wifi_Menu(void) {
     for(int i=0; i<4; i++) {
         uint16_t y_pos = BTN_START_Y + (i * (BTN_HEIGHT + BTN_GAP));
         
-        // Ramka
         TFT_DrawRect(BTN_START_X, y_pos, BTN_WIDTH, BTN_HEIGHT, TFT_WHITE);
         
-        // Tekst
         TFT_Print(BTN_START_X + 10, y_pos + (BTN_HEIGHT / 2) - 4, myNetworks[i].ssid, TFT_CYAN, TFT_BLACK, 1);
     }
 }
@@ -86,7 +79,6 @@ void Draw_Wifi_Menu(void) {
 void Wifi_Highlight_Button(int index, uint16_t color) {
     if (index < 0 || index >= 4) return;
 
-    // Obliczamy pozycj? Y
     uint16_t y_pos = BTN_START_Y + (index * (BTN_HEIGHT + BTN_GAP));
     
     TFT_DrawRect(BTN_START_X, y_pos, BTN_WIDTH, BTN_HEIGHT, color);
@@ -111,7 +103,6 @@ void Wifi_Connect_Selection(int index) {
 }
 
 // --- FUNKCJE SYSTEMOWE WINC1500 ---
-
 void wifi_setup(void)
 {
     winc_register_init();

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "../../ILI9341_files/tft_gfx.h" 
 
-// --- KONFIGURACJA LISTY MIAST ---
 #define MENU_XSTART      10
 #define MENU_YSTART      30
 #define MENU_WIDTH       180 
@@ -23,7 +22,6 @@ void Draw_City_Menu(void) {
         TFT_DrawRect(MENU_XSTART, y_pos, MENU_WIDTH, 30, TFT_WHITE);
         TFT_Print(MENU_XSTART + 10, y_pos + 8, (char*)polish_cities[i], TFT_CYAN, TFT_BLACK, 2);
     }
-    
     Draw_Logout_Button();
 }
 
@@ -37,20 +35,19 @@ int Check_City_Touch(uint16_t tx, uint16_t ty) {
     return -1;
 }
 
-// --- INTERFEJS POGODY ---
 void Draw_Weather_Interface(uint16_t headerColor, char* userName) {
     TFT_FillScreen(TFT_BLACK);
     
-    // 1. Nag?ówek
     TFT_FillRect(HEADER_X, HEADER_Y, HEADER_W, HEADER_H, headerColor);
     char headerText[30];
     sprintf(headerText, "POGODA - %s", userName);
     TFT_Print(5, 8, headerText, TFT_BLACK, headerColor, 2);
     
-    // 2. Przyciski
     Draw_Logout_Button();
     Draw_Email_Button();
     Draw_Return_Button();
+    Draw_Light_On_Button();
+    Draw_Light_Off_Button();
 
     TFT_Draw_Rainbow_Bar(SLIDER_X, SLIDER_Y, SLIDER_W, SLIDER_H);
 }
@@ -70,8 +67,18 @@ void Draw_Email_Button(void) {
     TFT_DrawRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_GREEN);
     TFT_Print(BUTTON_X + 25, EMAIL_Y + 14, "EMAIL", TFT_WHITE, TFT_BLACK, 2);
 }
+    
+void Draw_Light_On_Button(void) {
+    TFT_FillRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
+    TFT_DrawRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_YELLOW);
+    TFT_Print(BUTTON_X + 10, LIGHT_Y + 14, "BULB:ON", TFT_YELLOW, TFT_BLACK, 2);
+}
 
-// --- OBS?UGA DOTYKU ---
+void Draw_Light_Off_Button(void) {
+    TFT_FillRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
+    TFT_DrawRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_YELLOW);
+    TFT_Print(BUTTON_X + 10, LIGHT_Y + 14, "BULB:OFF", TFT_YELLOW, TFT_BLACK, 2);
+}
 
 bool Check_Logout_Touch(uint16_t tx, uint16_t ty) {
     if (tx >= BUTTON_X && tx <= (BUTTON_X + BUTTON_W) &&
@@ -89,7 +96,21 @@ bool Check_Email_Touch(uint16_t tx, uint16_t ty) {
     return false;
 }
 
-// --- ANIMACJE ---
+bool Check_Light_On_Touch(uint16_t tx, uint16_t ty) {
+    if (tx >= BUTTON_X && tx <= (BUTTON_X + BUTTON_W) &&
+        ty >= LIGHT_Y && ty <= (LIGHT_Y + BUTTON_H)) {
+        return true;
+    }
+    return false;
+}
+
+bool Check_Light_Off_Touch(uint16_t tx, uint16_t ty) {
+    if (tx >= BUTTON_X && tx <= (BUTTON_X + BUTTON_W) &&
+        ty >= LIGHT_Y && ty <= (LIGHT_Y + BUTTON_H)) {
+        return true;
+    }
+    return false;
+}
 
 void Animate_Logout_Click(void) {
     TFT_DrawRect(BUTTON_X, LOGOUT_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
@@ -102,4 +123,10 @@ void Animate_Sending_Button(void) {
 void Animate_Sent_Button(void) {
     TFT_FillRect(BUTTON_X, EMAIL_Y, BUTTON_W, BUTTON_H, TFT_WHITE);
     TFT_Print(BUTTON_X + 30, EMAIL_Y + 14, "SENT", TFT_BLACK, TFT_WHITE, 2);
+}
+
+void Animate_Light_Button(void) {
+    TFT_DrawRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_YELLOW);
+    TFT_FillRect(BUTTON_X + 1, LIGHT_Y + 1, BUTTON_W - 2, BUTTON_H - 2, TFT_BLACK);
+    TFT_Print(BUTTON_X + 30, LIGHT_Y + 14, "....", TFT_YELLOW, TFT_BLACK, 2);
 }

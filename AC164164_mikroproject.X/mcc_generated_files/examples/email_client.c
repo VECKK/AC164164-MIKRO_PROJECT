@@ -7,7 +7,7 @@
 
 // --- KONFIGURACJA GMAIL ---
 #define SMTP_SERVER         "smtp.gmail.com"
-#define SMTP_PORT           465 // Port SSL
+#define SMTP_PORT           465 
 #define SMTP_USERNAME_BASE64 "dTMzNTk3NjU0ODJAZ21haWwuY29t" 
 #define SMTP_PASSWORD_BASE64 "aXd4bW5kYmJ4emdydW16bg=="
 #define SENDER_EMAIL        "u3359765482@gmail.com"
@@ -88,8 +88,6 @@ void email_client_task(void) {
             break;
     }
 }
-
-// --- CALLBACKI ---
 
 static void email_resolve_cb(uint8_t *pu8DomainName, uint32_t u32ServerIP) {
     if (u32ServerIP != 0) {

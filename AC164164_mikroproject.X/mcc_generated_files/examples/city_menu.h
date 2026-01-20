@@ -20,31 +20,31 @@
 #define BUTTON_W      110
 #define BUTTON_H      39
 
-#define LOGOUT_Y      40
-#define EMAIL_Y       155
+#define LOGOUT_Y      35
+#define LIGHT_Y       90
+#define EMAIL_Y       145
 #define RETURN_Y      200
 
-// Deklaracja tablicy miast
 extern const char* polish_cities[5];
-
-// --- FUNKCJE GUI ---
-void Draw_City_Menu(void);
-int Check_City_Touch(uint16_t tx, uint16_t ty);
 
 void Draw_Weather_Interface(uint16_t headerColor, char* userName);
 
-// Rysowanie przycisków
 void Draw_Return_Button(void);
 void Draw_Logout_Button(void);
 void Draw_Email_Button(void);
+void Draw_City_Menu(void);
+void Draw_Light_On_Button(void);
+void Draw_Light_Off_Button(void);
 
-// Animacje
 void Animate_Logout_Click(void);
 void Animate_Sending_Button(void);
 void Animate_Sent_Button(void);
+void Animate_Light_Button(void);
 
-// Sprawdzanie dotyku
 bool Check_Logout_Touch(uint16_t tx, uint16_t ty);
 bool Check_Email_Touch(uint16_t tx, uint16_t ty);
+int Check_City_Touch(uint16_t tx, uint16_t ty);
+bool Check_Light_On_Touch(uint16_t tx, uint16_t ty);
+bool Check_Light_Off_Touch(uint16_t tx, uint16_t ty);
 
 #endif

@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// Flagi statusu
 extern bool wifi_connected;
 extern bool wifi_connect_error;
 

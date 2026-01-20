@@ -30,10 +30,8 @@
  
 typedef void (*interruptHandler)(void);
 
-/* arbitration interface */
 void i2c1_driver_close(void);
 
-/* Interrupt interfaces */
 void i2c1_enableIRQ(void);
 bool i2c1_IRQisEnabled(void);
 void i2c1_disableIRQ(void);
@@ -41,7 +39,6 @@ void i2c1_clearIRQ(void);
 void i2c1_setIRQ(void);
 void i2c1_waitForEvent(uint16_t*);
 
-/* I2C interfaces */
 bool  i2c1_driver_driver_open(void);
 char i2c1_driver_getRXData(void);
 void i2c1_driver_TXData(uint8_t);

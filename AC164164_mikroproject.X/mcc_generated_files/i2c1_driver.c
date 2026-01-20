@@ -41,7 +41,6 @@ void i2c1_driver_close(void)
     I2C1CONLbits.I2CEN = 0;
 }
 
-/* Interrupt Control */
 void i2c1_enableIRQ(void)
 {
     IEC1bits.MI2C1IE = 1;
@@ -73,11 +72,9 @@ void i2c1_setIRQ(void)
 
 void i2c1_waitForEvent(uint16_t *timeout)
 {
-    //uint16_t to = (timeout!=NULL)?*timeout:100;
-    //to <<= 8;
     if((IFS1bits.MI2C1IF == 0) && (IFS1bits.SI2C1IF == 0))
     {
-        while(1)// to--)
+        while(1)
         {
             if(IFS1bits.MI2C1IF || IFS1bits.SI2C1IF) break;
             __delay_us(100);
@@ -89,16 +86,9 @@ bool i2c1_driver_driver_open(void)
 {
     if(!I2C1CONLbits.I2CEN)
     {
-        // initialize the hardware
-        // STAT Setting 
         I2C1STAT = 0x0;
-        
-        // CON Setting
         I2C1CONL = 0x8000;
-        
-        // Baud Rate Generator Value: I2CBRG 100000;   
         I2C1BRG = 157;
-        
         return true;
     }
     else
@@ -191,13 +181,13 @@ void i2c1_driver_TXData(uint8_t d)
 void i2c1_driver_sendACK(void)
 {
     I2C1CONLbits.ACKDT = 0;
-    I2C1CONLbits.ACKEN = 1; // start the ACK/NACK
+    I2C1CONLbits.ACKEN = 1;
 }
 
 void i2c1_driver_sendNACK(void)
 {
     I2C1CONLbits.ACKDT = 1;
-    I2C1CONLbits.ACKEN = 1; // start the ACK/NACK
+    I2C1CONLbits.ACKEN = 1; 
 }
 
 void i2c1_driver_releaseClock(void)
@@ -237,7 +227,7 @@ bool i2c1_driver_isRead(void)
 
 void i2c1_driver_clearBusCollision(void)
 {
-    I2C1STATbits.BCL = 0; // clear the bus collision.
+    I2C1STATbits.BCL = 0; 
 }
 
 void i2c1_driver_enableStartIRQ(void)

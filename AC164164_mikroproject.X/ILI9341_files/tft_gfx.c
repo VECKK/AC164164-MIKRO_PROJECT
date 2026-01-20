@@ -15,7 +15,6 @@
 #include "glcdfont.c" 
 
 // --- Funkcje pomocnicze SPI ---
-
 void TFT_WriteCommand(uint8_t cmd) {
     TFT_DC_SetLow();
     TFT_CS_SetLow();
@@ -31,7 +30,6 @@ void TFT_WriteData(uint8_t data) {
 }
 
 // --- Funkcje Inicjalizacji ---
-
 void TFT_Init(void) {
     TFT_RST_SetHigh();
     __delay_ms(5);
@@ -40,17 +38,17 @@ void TFT_Init(void) {
     TFT_RST_SetHigh();
     __delay_ms(150);
 
-    TFT_WriteCommand(0x01); // Software Reset
+    TFT_WriteCommand(0x01); 
     __delay_ms(150);
-    TFT_WriteCommand(0x11); // Sleep Out
+    TFT_WriteCommand(0x11); 
     __delay_ms(150);
-    TFT_WriteCommand(0x3A); // Pixel Format
-    TFT_WriteData(0x55);    // 16-bit
-    TFT_WriteCommand(0x29); // Display ON
+    TFT_WriteCommand(0x3A); 
+    TFT_WriteData(0x55);    
+    TFT_WriteCommand(0x29); 
     __delay_ms(150);
     
-    // Ustawienie orientacji (opcjonalne)
-    TFT_WriteCommand(0x36); // Memory Access Control
+    // Ustawienie orientacji 
+    TFT_WriteCommand(0x36); 
     TFT_WriteData(0x20);
 }
 
@@ -71,7 +69,6 @@ void TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 }
 
 // --- Funkcje Rysowania ---
-
 void TFT_DrawPixel(uint16_t x, uint16_t y, uint16_t color) {
     if((x >= TFT_WIDTH) || (y >= TFT_HEIGHT)) return;
 
@@ -111,7 +108,6 @@ void TFT_FillScreen(uint16_t color) {
 
 // --- Funkcje Tekstowe ---
 
-// Rysuje pojedynczy znak
 void TFT_DrawChar(uint16_t x, uint16_t y, char c, uint16_t color, uint16_t bg, uint8_t size) {
     if((x >= TFT_WIDTH) || (y >= TFT_HEIGHT)) return;
 

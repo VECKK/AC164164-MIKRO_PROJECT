@@ -11,44 +11,35 @@
 #include "mcc_generated_files/mcc.h"
 #include "mcc_generated_files/i2c1_driver.h"
 #include "RFID/pn532.h"
+#include "BULB/bulb.h"
 #include "mcc_generated_files/examples/city_menu.h"
 #include "mcc_generated_files/examples/user_manager.h" 
 
-#define FCY 16000000UL
 #define PN532_I2C_ADDR (0x48 >> 1)
+#define FCY 16000000UL
 #include <libpic30.h>
 
-AppState currentState = STATE_WIFI_SELECT;
-
-// --- MAIN ---
 int main(void) {
     SYSTEM_Initialize();
     TFT_Init();
     Touch_Init();
-    
     i2c1_driver_driver_open();
-    if (PN532_Init()) {
-        LED_GREEN_SetHigh(); 
-        __delay_ms(200);
-        LED_GREEN_SetLow();
-    } 
-    
-    PN532_Tag currentTag;
+    PN532_Init();
     
     wifi_setup();
     weather_client_init();
-    
     Draw_Wifi_Menu();
     
+    AppState currentState = STATE_WIFI_SELECT;
+    PN532_Tag currentTag;
+    bool isLightOn = false;
     uint16_t x, y;
     int selectedNetworkIndex = -1;
     int timeoutCounter = 0; 
-    
     bool weatherScreenInit = false; 
     int last_slider_x = -1; 
-    
     int rfid_scan_counter = 0;
-
+    
     while (1) {
         wifi_task();
         email_client_task(); 
@@ -74,7 +65,9 @@ int main(void) {
             // --- 2. OCZEKIWANIE NA WIFI ---
             case STATE_CONNECTING:
                 if (wifi_connected) {
-                    TFT_FillScreen(TFT_BLACK);
+                    TFT_FillScreen(TFT_BLACK);    
+                    for(int k=0; k<50; k++) { wifi_task(); __delay_ms(10); }
+                    Turn_Off_Bulb();
                     Draw_Keypad();
                     Update_Pin_Display();
                     currentState = STATE_LOGIN;
@@ -107,7 +100,7 @@ int main(void) {
                 }
                 break;
 
-            // --- 3. LOGOWANIE PINEM I RFID ---
+            // --- 3. LOGOWANIE (Tylko Dotyk + RFID) ---
             case STATE_LOGIN:
                 // A. Obsluga Dotyku
                 if (Touch_IsPressed()) {
@@ -131,7 +124,6 @@ int main(void) {
                             if (detectedUser != -1) {
                                 currentUserIndex = detectedUser;
                             } else {
-                                // Komunikat bledu + aktywne oczekiwanie
                                 TFT_FillRect(18, 210, 205, 20, TFT_YELLOW); 
                                 TFT_Print(22, 214, "Brak uzytkownika", TFT_RED, TFT_YELLOW, 2);
                                 
@@ -148,13 +140,9 @@ int main(void) {
                     }
                 }
 
-                // C. Logowanie udane - Powitanie
+                // C. Logowanie udane
                 if (currentUserIndex != -1) {
                     TFT_FillScreen(TFT_BLACK);
-
-                    weather_set_city(users[currentUserIndex].startCity);
-                    weather_client_reset();
-                    
                     char welcomeBuf[40];
                     sprintf(welcomeBuf, "Witaj %s!", users[currentUserIndex].name);
                     TFT_Print(20, 140, welcomeBuf, TFT_GREEN, TFT_BLACK, 3);
@@ -164,6 +152,9 @@ int main(void) {
                         email_client_task();
                         __delay_ms(10);
                     }
+                    
+                    weather_set_city(users[currentUserIndex].startCity);
+                    weather_client_reset();
                     
                     weatherScreenInit = false; 
                     last_slider_x = -1;
@@ -194,17 +185,18 @@ int main(void) {
                 }
                 break;
 
-            // --- 5. POGODA ---
+            // --- 5. POGODA
             case STATE_WEATHER:
                 if (!weatherScreenInit) {
                     Draw_Weather_Interface(users[currentUserIndex].headerColor, users[currentUserIndex].name);
+                    Draw_Email_Button(); 
                     weatherScreenInit = true;
                 }
-            
+                
+                // --- B. OBSLUGA DOTYKU ---
                 if (Touch_IsPressed()) {
                     if (Touch_GetCoordinates(&x, &y)) {
                         
-                        // Zmiana koloru
                         if (x >= SLIDER_X && x <= (SLIDER_X + SLIDER_W) &&
                             y >= SLIDER_Y && y <= (SLIDER_Y + SLIDER_H)) 
                         {
@@ -225,10 +217,28 @@ int main(void) {
                             TFT_Print(5, 8, headerText, TFT_BLACK, newColor, 2);
                         }
                         
-                        // WYSYLANIE EMAILA
+                        // LIGHTBULB
+                        else if (isLightOn && Check_Light_On_Touch(x, y)) {
+                            Animate_Light_Button();       
+                            Turn_Off_Bulb();
+                            isLightOn = false;
+                            TFT_FillRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
+                            Draw_Light_Off_Button(); 
+                            __delay_ms(300);
+                        }
+                        else if (!isLightOn && Check_Light_Off_Touch(x, y)) {
+                            Animate_Light_Button();
+                            Turn_On_Bulb();
+                            isLightOn = true;
+                            TFT_FillRect(BUTTON_X, LIGHT_Y, BUTTON_W, BUTTON_H, TFT_BLACK);
+                            Draw_Light_On_Button();
+                            __delay_ms(300);
+                        }
+                    
+                        // Wysylanie Emaila
                         else if (Check_Email_Touch(x, y)) {
                             Animate_Sending_Button();
-                            
+
                             weather_client_reset();
                             for(int k=0; k<100; k++) { wifi_task(); __delay_ms(10); }
 
@@ -243,13 +253,13 @@ int main(void) {
                                 email_send_start(targetEmail, "Raport Pogodowy", weather_data);
                                 
                                 int timeout = 0;
-                                
                                 while(email_is_busy() && timeout < 1500) { 
                                     wifi_task();         
                                     email_client_task(); 
                                     __delay_ms(10);
                                     timeout++;
                                 }
+                                
                                 if (!email_is_busy()) {
                                     Animate_Sent_Button();
                                     TFT_Print(10, 260, "Wyslano!      ", TFT_GREEN, TFT_BLACK, 1);
@@ -268,10 +278,12 @@ int main(void) {
 
                         // Logout
                         else if (Check_Logout_Touch(x, y)) {
-                             Perform_Logout_Logic(&currentState);
-                             break;
+                            Turn_Off_Bulb();
+                            isLightOn = false;
+                            Perform_Logout_Logic(&currentState);
+                            break;
                         }
-                        // Return
+                        // Zmiana Miasta
                         else if (x >= BUTTON_X && y >= RETURN_Y) { 
                             weather_client_reset(); 
                             Draw_City_Menu(); 

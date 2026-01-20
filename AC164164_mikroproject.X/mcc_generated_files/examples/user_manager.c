@@ -7,7 +7,7 @@
 #define FCY 16000000UL
 #include <libpic30.h>
 
-// --- DEFINICJA DANYCH U?YTKOWNIKÓW ---
+// --- DEFINICJA DANYCH UZYTKOWNIKÓW ---
 UserProfile users[3] = {
     {"1111", TFT_CYAN,  "Warszawa", "Lukasz",   LUKASZ_EMAIL, {0xAA, 0xFC, 0x98, 0x04}},  
     {"2222", TFT_RED,   "Krakow",   "Kacper",   KACPER_EMAIL, {0xBC, 0x4A, 0x7E, 0x05}}, 
@@ -17,7 +17,6 @@ UserProfile users[3] = {
 int currentUserIndex = -1;
 
 // --- IMPLEMENTACJE FUNKCJI ---
-
 int FindUserByCard(PN532_Tag* tag) {
     if (tag->uidLen != 4) return -1; 
     for (int i = 0; i < 3; i++) {
@@ -33,11 +32,9 @@ void Perform_Logout_Logic(AppState* currentStatePtr) {
     __delay_ms(100); 
 
     currentUserIndex = -1;
-
     weather_client_reset(); 
-
     PN532_Init(); 
-    
+   
     TFT_FillScreen(TFT_BLACK);
     Draw_Keypad();
     Update_Pin_Display();
